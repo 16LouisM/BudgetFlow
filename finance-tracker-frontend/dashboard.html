@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>BudgetFlow Dashboard</title>
+  <link rel="stylesheet" href="css/dashboard.css">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+
+<div class="dashboard">
+
+  <!-- Sidebar -->
+  <aside class="sidebar">
+    <h2>💼 BudgetFlow</h2>
+    <ul>
+      <li>Dashboard</li>
+      <li>Add Income</li>
+      <li>Add Expense</li>
+      <li>Monthly Breakdown</li>
+      <li>Logout</li>
+    </ul>
+  </aside>
+
+  <!-- Main Content -->
+  <main class="main-content">
+
+    <header class="topbar">
+      <h1>Dashboard</h1>
+      <p>Welcome back 👋</p>
+    </header>
+
+    <!-- Summary Cards -->
+    <section class="cards">
+
+      <div class="card income">
+        <h3>Total Income</h3>
+        <p id="totalIncome">R0</p>
+      </div>
+
+      <div class="card expense">
+        <h3>Total Expenses</h3>
+        <p id="totalExpense">R0</p>
+      </div>
+
+      <div class="card balance">
+        <h3>Balance</h3>
+        <p id="balance">R0</p>
+      </div>
+
+    </section>
+
+    <!-- Chart Section -->
+    <section class="chart-section">
+      <canvas id="financeChart"></canvas>
+    </section>
+
+    <!-- Recent Transactions -->
+    <section class="transactions">
+      <h2>Recent Transactions</h2>
+      <ul id="transactionList">
+      </ul>
+    </section>
+
+  </main>
+</div>
+
+<script src="dashboard.js"></script>
+</body>
+</html>

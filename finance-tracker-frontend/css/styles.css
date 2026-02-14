@@ -70,3 +70,32 @@ body {
     background: #b2c74d;
 }
 
+/* footer */
+.app-footer {
+    position: absolute;
+    bottom: 0;
+    width: 100%;
+    background: rgba(255, 255, 255, 0.1);
+    -webkit-backdrop-filter: blur(15px);
+    backdrop-filter: blur(15px);
+    padding: 1rem;
+}
+
+.footer-container {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.footer-left h3 {
+    color: white;
+}
+
+.footer-center a {
+    color: #f0f0f0;
+    margin-right: 1rem;
+}
+
+.footer-right p {
+    color: #f0f0f0;
+}

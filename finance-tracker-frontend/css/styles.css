@@ -99,3 +99,11 @@ body {
 .footer-right p {
     color: #f0f0f0;
 }
+
+footer {
+  background: rgba(0, 0, 0, 0.85);
+  color: white;
+  text-align: center;
+  padding: 20px;
+  margin-top: 40px;
+}

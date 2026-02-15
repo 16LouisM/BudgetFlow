@@ -1,34 +1,34 @@
 body {
   margin: 0;
   font-family: Arial, sans-serif;
-
-  /* SAME IMAGE AS LOGIN */
-  background: url("../assets/images/login-background.png") no-repeat center center/cover;
+  background: url("../assets/images/login-background.png") no-repeat fixed center center / cover;
   min-height: 100vh;
   position: relative;
 }
 
-/* Dark overlay for readability */
 body::before {
   content: "";
   position: fixed;
   inset: 0;
-  background: rgba(0, 0, 0, 0.6); /* adjust darkness here */
+  background: rgba(0, 0, 0, 0.6);
   z-index: -1;
 }
 
-
 .dashboard {
   display: flex;
+  min-height: calc(100vh - 80px);
 }
 
-/* Sidebar */
 .sidebar {
-  width: 220px;
+  width: 260px;
+  padding: 20px;
   background: #1e1e2f;
   color: white;
-  padding: 20px;
   height: 100vh;
+  position: fixed;
+  top: 0;
+  left: 0;
+  box-sizing: border-box;
 }
 
 .sidebar h2 {
@@ -45,20 +45,29 @@ body::before {
   cursor: pointer;
 }
 
-/* Main Content */
 .main-content {
   flex: 1;
+  margin-left: 260px;
   padding: 30px;
   -webkit-backdrop-filter: blur(8px);
   backdrop-filter: blur(8px);
   background: rgba(255, 255, 255, 0.08);
   border-radius: 15px;
-  margin: 20px;
+  margin-top: 20px;
+  margin-right: 20px;
+  margin-bottom: 20px;
 }
-
 
 .topbar {
   margin-bottom: 30px;
+}
+
+.topbar h1 {
+  color: white;
+}
+
+.topbar p {
+  color: #ffffff; 
 }
 
 .cards {

@@ -1,5 +1,5 @@
-const income = 5000;
-const expenses = 3200;
+const income = 0;
+const expenses = 0;
 const balance = income - expenses;
 
 document.getElementById("totalIncome").innerText = "R" + income;
@@ -21,16 +21,17 @@ const financeChart = new Chart(ctx, {
 });
 
 // Transactions
-const transactions = [
-  { type: "Income", amount: 5000 },
-  { type: "Expense", amount: 1200 },
-  { type: "Expense", amount: 2000 }
-];
+const transactions = [];
 
 const list = document.getElementById("transactionList");
-
-transactions.forEach(t => {
+if (transactions.length === 0) {
   const li = document.createElement("li");
-  li.textContent = `${t.type} - R${t.amount}`;
+  li.textContent = "No transactions yet.";
   list.appendChild(li);
-});
+} else {
+  transactions.forEach(t => {
+    const li = document.createElement("li");
+    li.textContent = `${t.type} - R${t.amount}`;
+    list.appendChild(li);
+  });
+}

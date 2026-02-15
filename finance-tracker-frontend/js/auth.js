@@ -23,7 +23,7 @@ loginForm.addEventListener('submit', async (e) => {
 
         if (response.ok) {
             localStorage.setItem('token', data.token);
-            window.location.href = 'dashboard.html';
+            window.location.href = '../finance-tracker-frontend/pages/dashboard.html';
         } else {
             errorMsg.textContent = data.message || 'Login failed';
         }

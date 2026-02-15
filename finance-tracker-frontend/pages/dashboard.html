@@ -6,6 +6,7 @@
   <title>BudgetFlow Dashboard</title>
   <link rel="stylesheet" href="../css/dashboard.css">
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
 </head>
 <body>
 
@@ -13,42 +14,60 @@
 
   <!-- Sidebar -->
   <aside class="sidebar">
-    <h2>💼 BudgetFlow</h2>
-    <ul>
-      <li>Dashboard</li>
-      <li>Add Income</li>
-      <li>Add Expense</li>
-      <li>Monthly Breakdown</li>
-      <li>Logout</li>
+    <div class="sidebar-header">
+      <img src="../assets/images/login-background.png" alt="BudgetFlow Logo" class="sidebar-logo">
+      <h2>BudgetFlow</h2>
+    </div>
+
+    <ul class="menu">
+      <li>
+        <i class="fas fa-wallet"></i>
+        <span>Add Income</span>
+      </li>
+      <li>
+        <i class="fas fa-credit-card"></i>
+        <span>Add Expense</span>
+      </li>
+      <li>
+        <i class="fas fa-chart-pie"></i>
+        <span>Monthly Breakdown</span>
+      </li>
+      <li>
+        <i class="fas fa-sign-out-alt"></i>
+        <span>Logout</span>
+      </li>
     </ul>
+
+    <div class="sidebar-footer">
+      <p>🔐 Bank-Level Encryption</p>
+      <p>OAuth 2.0 Secured</p>
+      <small>© 2026 BudgetFlow</small>
+    </div>
   </aside>
 
   <!-- Main Content -->
   <main class="main-content">
-
     <header class="topbar">
       <h1>Dashboard</h1>
       <p>Welcome back 👋</p>
     </header>
 
-    <!-- Summary Cards -->
+    <!-- Summary Cards with Icons -->
     <section class="cards">
-
       <div class="card income">
-        <h3>Total Income</h3>
+        <h3><i class="fas fa-arrow-up"></i> Total Income</h3>
         <p id="totalIncome">R0</p>
       </div>
 
       <div class="card expense">
-        <h3>Total Expenses</h3>
+        <h3><i class="fas fa-arrow-down"></i> Total Expenses</h3>
         <p id="totalExpense">R0</p>
       </div>
 
       <div class="card balance">
-        <h3>Balance</h3>
+        <h3><i class="fas fa-scale-balanced"></i> Balance</h3>
         <p id="balance">R0</p>
       </div>
-
     </section>
 
     <!-- Chart Section -->
@@ -59,14 +78,15 @@
     <!-- Recent Transactions -->
     <section class="transactions">
       <h2>Recent Transactions</h2>
-      <ul id="transactionList">
-      </ul>
+      <ul id="transactionList"></ul>
     </section>
-
   </main>
 </div>
+
+<!-- Footer Container -->
 <div id="footer-container"></div>
+
 <script src="../js/dashboard.js"></script>
-<script src="../js/loadFooter.js"></script>
+<script src="../js/loadfooter.js"></script>
 </body>
 </html>

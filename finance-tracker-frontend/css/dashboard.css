@@ -23,7 +23,7 @@ body {
 }
 
 /* =========================
-   FIXED SIDEBAR
+   FIXED SIDEBAR (desktop)
 ========================= */
 .sidebar {
   width: 250px;
@@ -35,7 +35,7 @@ body {
   top: 0;
   left: 0;
   bottom: 0;
-  overflow-y: auto; /* allows scrolling if content overflows */
+  overflow-y: auto;
   z-index: 100;
 }
 
@@ -59,9 +59,14 @@ body {
 .sidebar ul {
   list-style: none;
   padding: 0;
+  display: flex;
+  flex-direction: column;
+  width: 100%;
 }
 
+/* Make all menu items equal width and stretch */
 .sidebar ul li {
+  flex: 1 1 0%;           /* Equal width for all items */
   position: relative;
   display: flex;
   align-items: center;
@@ -137,7 +142,7 @@ body {
   }
 }
 
-/* Sidebar Footer */
+/* Sidebar Footer (desktop) */
 .sidebar-footer {
   margin-top: auto;
   text-align: center;
@@ -149,10 +154,14 @@ body {
 
 /* =========================
    MAIN CONTENT (offset for fixed sidebar)
+   Now with max-width to govern cards & chart together
 ========================= */
 .main-content {
   margin-left: 250px; /* same as sidebar width */
   padding: 40px;
+  max-width: 1200px;   /* Set your desired max-width */
+  width: calc(100% - 250px); /* Fill remaining width but not exceed max-width */
+  margin-right: auto;  /* Center the content */
 }
 
 /* Dashboard Title & Welcome */
@@ -170,7 +179,7 @@ body {
 }
 
 /* =========================
-   SUMMARY CARDS
+   SUMMARY CARDS with icons
 ========================= */
 .cards {
   display: grid;
@@ -188,12 +197,12 @@ body {
 }
 
 .card h3 {
-  margin-bottom: 10px;
-  font-size: 16px;
-  color: #9ca3af;
   display: flex;
   align-items: center;
   gap: 8px;
+  margin-bottom: 10px;
+  font-size: 16px;
+  color: #9ca3af;
 }
 
 .card p {
@@ -254,54 +263,107 @@ body {
 }
 
 /* =========================
-   RESPONSIVE: on small screens, sidebar becomes static
+   MOBILE FOOTER INFO (hidden on desktop)
+   Appears below transactions on mobile
+========================= */
+.mobile-footer-info {
+  display: none; /* hidden by default */
+  text-align: center;
+  font-size: 12px;
+  color: #9ca3af;
+  border-top: 1px solid rgba(255,255,255,0.1);
+  padding-top: 20px;
+  margin-top: 30px;
+}
+
+/* =========================
+   RESPONSIVE: mobile adjustments
 ========================= */
 @media (max-width: 900px) {
   body {
     flex-direction: column;
   }
 
+  /* Sidebar becomes static and stacks vertically */
   .sidebar {
-    position: static; /* disable fixed on mobile */
+    position: static;
     width: 100%;
-    flex-direction: row;
-    justify-content: space-between;
-    align-items: center;
+    flex-direction: column;
+    align-items: stretch;
     padding: 15px 20px;
     height: auto;
     overflow-y: visible;
   }
 
   .sidebar-header {
-    margin-bottom: 0;
+    margin-bottom: 15px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
   }
 
   .sidebar-logo {
-    width: 50px;
+    width: 40px;
+    margin-bottom: 0;
   }
 
-  .sidebar ul {
-    display: flex;
-    gap: 10px;
+  .sidebar-header h2 {
+    font-size: 18px;
     margin: 0;
   }
 
-  .sidebar ul li {
-    margin-bottom: 0;
-    padding: 10px 12px;
+  /* Menu items: wrap and maintain equal width */
+  .sidebar ul {
+    flex-direction: row;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin: 0 0 15px 0;
+    justify-content: center;
   }
 
+  .sidebar ul li {
+    flex: 1 1 0%;           /* already equal width from global */
+    min-width: 100px;       /* optional, prevents too narrow */
+    text-align: center;      /* center icons + text on mobile */
+    margin-bottom: 0;
+    padding: 8px 12px;
+    font-size: 14px;
+  }
+
+  /* Hide original sidebar footer on mobile */
   .sidebar-footer {
     display: none;
   }
 
   .main-content {
-    margin-left: 0; /* reset margin */
+    margin-left: 0;
     padding: 20px;
+    max-width: 100%; /* allow full width on mobile */
+    width: 100%;
   }
 
-  .footer-container {
-    flex-direction: column;
-    text-align: center;
+  .cards {
+    grid-template-columns: 1fr; /* stack cards vertically */
+  }
+
+  /* Show mobile footer info */
+  .mobile-footer-info {
+    display: block;
+  }
+}
+
+/* Extra small screens (optional) */
+@media (max-width: 480px) {
+  .sidebar ul li {
+    padding: 6px 10px;
+    font-size: 12px;
+    min-width: 80px;
+  }
+  .sidebar-logo {
+    width: 35px;
+  }
+  .sidebar-header h2 {
+    font-size: 16px;
   }
 }

@@ -20,11 +20,11 @@
     </div>
 
     <ul class="menu">
-      <li>
+      <li id="addIncomeBtn">
         <i class="fas fa-wallet"></i>
         <span>Add Income</span>
       </li>
-      <li>
+      <li id="addExpenseBtn">
         <i class="fas fa-credit-card"></i>
         <span>Add Expense</span>
       </li>
@@ -38,7 +38,7 @@
       </li>
     </ul>
 
-    <!-- Sidebar footer (visible on desktop only) -->
+    <!-- Sidebar footer (desktop only) -->
     <div class="sidebar-footer">
       <p>🔐 Bank-Level Encryption</p>
       <p>OAuth 2.0 Secured</p>
@@ -80,7 +80,7 @@
       <ul id="transactionList"></ul>
     </section>
 
-    <!-- Mobile Footer Info – appears below transactions on mobile -->
+    <!-- Mobile Footer Info (appears below transactions on mobile) -->
     <div class="mobile-footer-info">
       <p>🔐 Bank-Level Encryption</p>
       <p>OAuth 2.0 Secured</p>
@@ -89,9 +89,10 @@
   </main>
 </div>
 
-<!-- Optional global footer container (empty if no script) -->
-<div id="footer-container"></div>
+<!-- Container for dynamically loaded modal -->
+<div id="modal-container"></div>
 
 <script src="../js/dashboard.js"></script>
+<!-- No separate loadModal.js needed – everything is in dashboard.js -->
 </body>
 </html>

@@ -254,57 +254,6 @@ body {
 }
 
 /* =========================
-   FOOTER (loaded dynamically)
-========================= */
-#footer-container {
-  width: 100%;
-  flex-shrink: 0;
-}
-
-.app-footer {
-  background: #0b0f1a;
-  color: white;
-  padding: 20px;
-  text-align: center;
-  border-top: 1px solid rgba(255,255,255,0.1);
-}
-
-.footer-container {
-  max-width: 1200px;
-  margin: 0 auto;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  flex-wrap: wrap;
-  gap: 20px;
-}
-
-.footer-left h3 {
-  color: white;
-  margin-bottom: 5px;
-}
-
-.footer-left span {
-  color: #007bff;
-}
-
-.footer-center a {
-  color: #9ca3af;
-  margin: 0 10px;
-  text-decoration: none;
-  transition: color 0.3s;
-}
-
-.footer-center a:hover {
-  color: #007bff;
-}
-
-.footer-right p {
-  margin: 0;
-  color: #9ca3af;
-}
-
-/* =========================
    RESPONSIVE: on small screens, sidebar becomes static
 ========================= */
 @media (max-width: 900px) {

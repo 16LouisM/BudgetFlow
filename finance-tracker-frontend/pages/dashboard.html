@@ -38,7 +38,6 @@
       </li>
     </ul>
 
-    <!-- Sidebar footer (desktop only) -->
     <div class="sidebar-footer">
       <p>🔐 Bank-Level Encryption</p>
       <p>OAuth 2.0 Secured</p>
@@ -53,32 +52,38 @@
       <p>Welcome back 👋</p>
     </header>
 
-    <!-- Summary Cards -->
-    <section class="cards">
-      <div class="card income">
-        <h3><i class="fas fa-arrow-up"></i> Total Income</h3>
-        <p id="totalIncome">R0</p>
-      </div>
-      <div class="card expense">
-        <h3><i class="fas fa-arrow-down"></i> Total Expenses</h3>
-        <p id="totalExpense">R0</p>
-      </div>
-      <div class="card balance">
-        <h3><i class="fas fa-scale-balanced"></i> Balance</h3>
-        <p id="balance">R0</p>
-      </div>
-    </section>
+    <!-- Two-column wrapper -->
+    <div class="content-wrapper">
+      <!-- Left column: cards + chart -->
+      <div class="left-column">
+        <!-- Summary Cards -->
+        <section class="cards">
+          <div class="card income">
+            <h3><i class="fas fa-arrow-up"></i> Total Income</h3>
+            <p id="totalIncome">R0</p>
+          </div>
+          <div class="card expense">
+            <h3><i class="fas fa-arrow-down"></i> Total Expenses</h3>
+            <p id="totalExpense">R0</p>
+          </div>
+          <div class="card balance">
+            <h3><i class="fas fa-scale-balanced"></i> Balance</h3>
+            <p id="balance">R0</p>
+          </div>
+        </section>
 
-    <!-- Chart Section -->
-    <section class="chart-section">
-      <canvas id="financeChart"></canvas>
-    </section>
+        <!-- Chart Section -->
+        <section class="chart-section">
+          <canvas id="financeChart"></canvas>
+        </section>
+      </div>
 
-    <!-- Recent Transactions -->
-    <section class="transactions">
-      <h2>Recent Transactions</h2>
-      <ul id="transactionList"></ul>
-    </section>
+      <!-- Right column: transactions -->
+      <section class="transactions">
+        <h2>Recent Transactions</h2>
+        <ul id="transactionList"></ul>
+      </section>
+    </div>
 
     <!-- Mobile Footer Info (appears below transactions on mobile) -->
     <div class="mobile-footer-info">
@@ -92,7 +97,9 @@
 <!-- Container for dynamically loaded modal -->
 <div id="modal-container"></div>
 
+<!-- Footer Container (global footer) -->
+<div id="footer-container"></div>
+
 <script src="../js/dashboard.js"></script>
-<!-- No separate loadModal.js needed – everything is in dashboard.js -->
 </body>
 </html>

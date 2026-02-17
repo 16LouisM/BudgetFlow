@@ -1,0 +1,116 @@
+/* monthly-breakdown.css – additional styles for breakdown page */
+
+.breakdown-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 30px;
+  margin-top: 30px;
+}
+
+.chart-section {
+  background: #1f2937;
+  padding: 25px;
+  border-radius: 16px;
+}
+
+.chart-section h2 {
+  margin-bottom: 20px;
+  font-size: 18px;
+}
+
+.budget-messages {
+  margin-top: 20px;
+  padding: 15px;
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 8px;
+}
+
+.budget-messages p {
+  margin: 8px 0;
+  padding: 8px;
+  border-radius: 6px;
+}
+
+.budget-messages .warning {
+  background: rgba(220, 53, 69, 0.2);
+  border-left: 4px solid #dc3545;
+  color: #ff8a8a;
+}
+
+.budget-messages .success {
+  background: rgba(40, 167, 69, 0.2);
+  border-left: 4px solid #28a745;
+  color: #a3d9a5;
+}
+
+.budget-table-section {
+  background: #1f2937;
+  padding: 25px;
+  border-radius: 16px;
+  overflow-x: auto;
+}
+
+.budget-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 15px;
+}
+
+.budget-table th {
+  text-align: left;
+  padding: 12px 8px;
+  background: rgba(255, 255, 255, 0.1);
+  color: #9ca3af;
+  font-weight: 600;
+}
+
+.budget-table td {
+  padding: 10px 8px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.budget-table tr:last-child td {
+  border-bottom: none;
+}
+
+.budget-table .exceeded {
+  color: #dc3545;
+  font-weight: 600;
+}
+
+.budget-table .warning {
+  color: #ffc107;
+}
+
+.budget-table .good {
+  color: #28a745;
+}
+
+.insights {
+  background: #1f2937;
+  padding: 25px;
+  border-radius: 16px;
+  margin-top: 30px;
+}
+
+.insights h2 {
+  margin-bottom: 20px;
+}
+
+.insights p {
+  margin: 10px 0;
+  padding: 12px;
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 8px;
+}
+
+.card.budget-remaining {
+  border-left: 4px solid #ffc107;
+}
+
+/* Responsive */
+@media (max-width: 900px) {
+  .breakdown-grid {
+    grid-template-columns: 1fr;
+  }
+}

@@ -1,15 +1,22 @@
 // dashboard.js
 
+// ======================
+// Global variables
+// ======================
 let income = 0, expenses = 0, balance = 0;
 let transactions = [];
 let financeChart;
 
+// DOM elements
 const totalIncomeEl = document.getElementById('totalIncome');
 const totalExpenseEl = document.getElementById('totalExpense');
 const balanceEl = document.getElementById('balance');
 const transactionListEl = document.getElementById('transactionList');
 const ctx = document.getElementById('financeChart')?.getContext('2d');
 
+// ======================
+// Helper functions
+// ======================
 function formatDate(dateString) {
   if (!dateString) return 'No date';
   const [year, month, day] = dateString.split('-');
@@ -33,10 +40,10 @@ function initChart() {
 }
 
 function updateUI() {
-  totalIncomeEl.textContent = 'R' + income;
-  totalExpenseEl.textContent = 'R' + expenses;
+  totalIncomeEl.textContent = 'R' + income.toLocaleString();
+  totalExpenseEl.textContent = 'R' + expenses.toLocaleString();
   balance = income - expenses;
-  balanceEl.textContent = 'R' + balance;
+  balanceEl.textContent = 'R' + balance.toLocaleString();
   if (financeChart) {
     financeChart.data.datasets[0].data = [income, expenses];
     financeChart.update();
@@ -55,7 +62,29 @@ function updateUI() {
   }
 }
 
+// Load transactions from localStorage (persist between pages)
+function loadTransactions() {
+  const stored = localStorage.getItem('budgetflow_transactions');
+  if (stored) {
+    transactions = JSON.parse(stored);
+    // Recalculate totals from transactions array
+    income = transactions.filter(t => t.type === 'income').reduce((sum, t) => sum + t.amount, 0);
+    expenses = transactions.filter(t => t.type === 'expense').reduce((sum, t) => sum + t.amount, 0);
+  } else {
+    transactions = [];
+    income = 0;
+    expenses = 0;
+  }
+}
+
+// Save transactions to localStorage
+function saveTransactions() {
+  localStorage.setItem('budgetflow_transactions', JSON.stringify(transactions));
+}
+
+// ======================
 // Fallback modal HTML for Income
+// ======================
 const fallbackIncomeModalHTML = `
 <div id="incomeModal" class="modal">
   <div class="modal-content">
@@ -97,7 +126,9 @@ const fallbackIncomeModalHTML = `
 </div>
 `;
 
+// ======================
 // Fallback modal HTML for Expense
+// ======================
 const fallbackExpenseModalHTML = `
 <div id="expenseModal" class="modal">
   <div class="modal-content">
@@ -141,7 +172,9 @@ const fallbackExpenseModalHTML = `
 </div>
 `;
 
-// Generic modal loader – appends without destroying existing content
+// ======================
+// Generic modal loader (appends without destroying)
+// ======================
 function loadModal(modalPath, containerId, fallbackHTML, callback) {
   fetch(modalPath)
     .then(response => {
@@ -159,7 +192,9 @@ function loadModal(modalPath, containerId, fallbackHTML, callback) {
     });
 }
 
-// Initialize Income Modal
+// ======================
+// Income Modal initialization
+// ======================
 function initIncomeModal() {
   const modal = document.getElementById('incomeModal');
   const addIncomeBtn = document.getElementById('addIncomeBtn');
@@ -213,9 +248,13 @@ function initIncomeModal() {
       return;
     }
 
+    // Add to local data
     income += amount;
     transactions.push({ type: 'income', amount, description, date, category });
+    saveTransactions();
     updateUI();
+
+    // Reset form
     form.reset();
     if (dateInput) dateInput.value = `${y}-${m}-${d}`;
     modal.style.display = 'none';
@@ -223,7 +262,9 @@ function initIncomeModal() {
   });
 }
 
-// Initialize Expense Modal
+// ======================
+// Expense Modal initialization
+// ======================
 function initExpenseModal() {
   const modal = document.getElementById('expenseModal');
   const addExpenseBtn = document.getElementById('addExpenseBtn');
@@ -277,9 +318,13 @@ function initExpenseModal() {
       return;
     }
 
+    // Add to local data
     expenses += amount;
     transactions.push({ type: 'expense', amount, description, date, category });
+    saveTransactions();
     updateUI();
+
+    // Reset form
     form.reset();
     if (dateInput) dateInput.value = `${y}-${m}-${d}`;
     modal.style.display = 'none';
@@ -287,13 +332,30 @@ function initExpenseModal() {
   });
 }
 
+// ======================
+// Navigation
+// ======================
+document.getElementById('monthlyBreakdownBtn')?.addEventListener('click', () => {
+  window.location.href = 'monthly-breakdown.html';
+});
+
+document.getElementById('logoutBtn')?.addEventListener('click', () => {
+  // Clear any session data if needed, then redirect to login
+  window.location.href = 'login.html';
+});
+
+// ======================
 // Main initialization
+// ======================
 document.addEventListener('DOMContentLoaded', () => {
+  // Load saved transactions
+  loadTransactions();
+
+  // Initialize chart and UI
   initChart();
   updateUI();
 
-  // Adjust paths if your folder structure differs
-  // Load Income modal
+  // Load and initialize modals
   loadModal(
     'components/modal-income.html',
     'modal-container',
@@ -301,7 +363,6 @@ document.addEventListener('DOMContentLoaded', () => {
     initIncomeModal
   );
 
-  // Load Expense modal
   loadModal(
     'components/modal-expense.html',
     'modal-container',

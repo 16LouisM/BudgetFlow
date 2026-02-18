@@ -227,7 +227,92 @@ body {
 }
 
 /* =========================
-   CHART SECTION
+   MONTHLY OVERVIEW CARD
+========================= */
+.monthly-overview {
+  background: #1f2937;
+  padding: 25px;
+  border-radius: 16px;
+}
+
+.monthly-overview h2 {
+  margin-bottom: 20px;
+  font-size: 18px;
+}
+
+.budget-info {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 15px;
+}
+
+.budget-limit span,
+.budget-remaining span {
+  color: #9ca3af;
+  font-size: 14px;
+}
+
+.budget-limit strong,
+.budget-remaining strong {
+  font-size: 18px;
+  margin-left: 8px;
+}
+
+.progress-bar-container {
+  background: #374151;
+  height: 12px;
+  border-radius: 6px;
+  margin: 15px 0;
+  overflow: hidden;
+}
+
+.progress-bar {
+  height: 100%;
+  background: #007bff;
+  border-radius: 6px;
+  transition: width 0.3s ease;
+}
+
+.mini-calendar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+  margin: 15px 0;
+  justify-content: center;
+}
+
+.mini-calendar span {
+  width: 28px;
+  height: 28px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #374151;
+  border-radius: 4px;
+  font-size: 12px;
+  color: #d1d5db;
+}
+
+.mini-calendar span.has-transaction {
+  background: #007bff;
+  color: white;
+  font-weight: bold;
+}
+
+.view-all-link {
+  display: inline-block;
+  margin-top: 10px;
+  color: #007bff;
+  text-decoration: none;
+  font-size: 14px;
+}
+
+.view-all-link:hover {
+  text-decoration: underline;
+}
+
+/* =========================
+   CHART SECTION (kept for compatibility)
 ========================= */
 .chart-section {
   background: #1f2937;
@@ -255,11 +340,45 @@ body {
 #transactionList li {
   padding: 12px;
   border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-  font-size: 14px;
 }
 
 #transactionList li:last-child {
   border-bottom: none;
+}
+
+.transaction-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 10px;
+}
+
+.transaction-desc {
+  flex: 2;
+  font-size: 14px;
+}
+
+.transaction-date {
+  flex: 1;
+  color: #9ca3af;
+  font-size: 12px;
+  text-align: center;
+}
+
+.transaction-item .income-amount,
+.transaction-item .expense-amount {
+  flex: 1;
+  font-weight: 600;
+  font-size: 14px;
+  text-align: right;
+}
+
+.transaction-item .income-amount {
+  color: #28a745;
+}
+
+.transaction-item .expense-amount {
+  color: #dc3545;
 }
 
 /* =========================
@@ -505,6 +624,19 @@ body {
   }
   .card p {
     font-size: 20px;
+  }
+  
+  .transaction-item {
+    flex-wrap: wrap;
+    gap: 5px;
+  }
+  .transaction-desc {
+    flex: 1 1 100%;
+  }
+  .transaction-date,
+  .transaction-item .income-amount,
+  .transaction-item .expense-amount {
+    flex: 1;
   }
 }
 

@@ -13,7 +13,7 @@
 
 <div class="dashboard">
 
-  <!-- Sidebar (same as dashboard, but with Dashboard link) -->
+  <!-- Sidebar -->
   <aside class="sidebar">
     <div class="sidebar-header">
       <img src="../assets/images/login-background.png" alt="BudgetFlow Logo" class="sidebar-logo">
@@ -21,18 +21,22 @@
     </div>
 
     <ul class="menu">
-      <li id="dashboardBtn">
-        <i class="fas fa-tachometer-alt"></i>
-        <span>Dashboard</span>
-      </li>
+      <!-- First: Add Income -->
       <li id="addIncomeBtn">
         <i class="fas fa-wallet"></i>
         <span>Add Income</span>
       </li>
+      <!-- Second: Add Expense -->
       <li id="addExpenseBtn">
         <i class="fas fa-credit-card"></i>
         <span>Add Expense</span>
       </li>
+      <!-- Third: Dashboard (replaces Monthly Breakdown) -->
+      <li id="dashboardBtn">
+        <i class="fas fa-tachometer-alt"></i>
+        <span>Dashboard</span>
+      </li>
+      <!-- Fourth: Logout -->
       <li id="logoutBtn">
         <i class="fas fa-sign-out-alt"></i>
         <span>Logout</span>
@@ -53,7 +57,7 @@
       <p id="monthDisplay">April 2024</p>
     </header>
 
-    <!-- Summary Cards (dynamic) -->
+    <!-- Summary Cards -->
     <section class="cards">
       <div class="card income">
         <h3><i class="fas fa-arrow-up"></i> Total Income</h3>
@@ -81,9 +85,11 @@
         <div id="budgetMessages" class="budget-messages"></div>
       </section>
 
-      <!-- Budget Table -->
+      <!-- Budget Table with Set Budgets button -->
       <section class="budget-table-section">
-        <h2>Budget vs Actual</h2>
+        <div class="budget-header">
+          <h2>Budget vs Actual</h2>
+        </div>
         <table class="budget-table">
           <thead>
             <tr>
@@ -116,7 +122,7 @@
   </main>
 </div>
 
-<!-- Modal Container (for Add Income/Expense) -->
+<!-- Modal Container -->
 <div id="modal-container"></div>
 
 <!-- Footer Container -->

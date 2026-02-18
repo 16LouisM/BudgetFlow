@@ -5,69 +5,42 @@
 // ======================
 let income = 0, expenses = 0, balance = 0;
 let transactions = [];
-let financeChart;
+let categoryBudgets = {}; // used for budget limit
 
 // DOM elements
 const totalIncomeEl = document.getElementById('totalIncome');
 const totalExpenseEl = document.getElementById('totalExpense');
 const balanceEl = document.getElementById('balance');
 const transactionListEl = document.getElementById('transactionList');
-const ctx = document.getElementById('financeChart')?.getContext('2d');
+const overviewMonthEl = document.getElementById('overviewMonth');
+const budgetLimitEl = document.getElementById('budgetLimit');
+const budgetRemainingEl = document.getElementById('budgetRemaining');
+const budgetProgressEl = document.getElementById('budgetProgress');
+const miniCalendarEl = document.querySelector('.mini-calendar');
 
 // ======================
 // Helper functions
 // ======================
-function formatDate(dateString) {
-  if (!dateString) return 'No date';
-  const [year, month, day] = dateString.split('-');
-  return `${year}/${month}/${day}`;
+function formatDisplayDate(dateString) {
+  if (!dateString) return '';
+  const [ month, day] = dateString.split('-');
+  return `${month}/${day}`; // for transaction list
 }
 
-function initChart() {
-  if (!ctx) return;
-  if (financeChart) financeChart.destroy();
-  financeChart = new Chart(ctx, {
-    type: 'pie',
-    data: {
-      labels: ['Income', 'Expenses'],
-      datasets: [{
-        data: [income, expenses],
-        backgroundColor: ['#28a745', '#dc3545']
-      }]
-    },
-    options: { responsive: true }
-  });
+function setCurrentMonthYear() {
+  const now = new Date();
+  const monthNames = ['January', 'February', 'March', 'April', 'May', 'June',
+    'July', 'August', 'September', 'October', 'November', 'December'];
+  const month = monthNames[now.getMonth()];
+  const year = now.getFullYear();
+  if (overviewMonthEl) overviewMonthEl.textContent = `${month} ${year}`;
 }
 
-function updateUI() {
-  totalIncomeEl.textContent = 'R' + income.toLocaleString();
-  totalExpenseEl.textContent = 'R' + expenses.toLocaleString();
-  balance = income - expenses;
-  balanceEl.textContent = 'R' + balance.toLocaleString();
-  if (financeChart) {
-    financeChart.data.datasets[0].data = [income, expenses];
-    financeChart.update();
-  }
-  transactionListEl.innerHTML = '';
-  if (transactions.length === 0) {
-    transactionListEl.innerHTML = '<li>No transactions yet. Add some!</li>';
-  } else {
-    transactions.slice().reverse().forEach(t => {
-      const li = document.createElement('li');
-      const icon = t.type === 'income' ? '💰' : '💸';
-      const typeLabel = t.type === 'income' ? 'Income' : 'Expense';
-      li.textContent = `${icon} ${typeLabel}: R${t.amount} - ${t.description} (${formatDate(t.date)})`;
-      transactionListEl.appendChild(li);
-    });
-  }
-}
-
-// Load transactions from localStorage (persist between pages)
+// Load transactions from localStorage
 function loadTransactions() {
   const stored = localStorage.getItem('budgetflow_transactions');
   if (stored) {
     transactions = JSON.parse(stored);
-    // Recalculate totals from transactions array
     income = transactions.filter(t => t.type === 'income').reduce((sum, t) => sum + t.amount, 0);
     expenses = transactions.filter(t => t.type === 'expense').reduce((sum, t) => sum + t.amount, 0);
   } else {
@@ -77,14 +50,104 @@ function loadTransactions() {
   }
 }
 
-// Save transactions to localStorage
-function saveTransactions() {
-  localStorage.setItem('budgetflow_transactions', JSON.stringify(transactions));
+// Load budgets from localStorage (to get total budget limit)
+function loadBudgets() {
+  const stored = localStorage.getItem('budgetflow_budgets');
+  if (stored) {
+    categoryBudgets = JSON.parse(stored);
+  } else {
+    categoryBudgets = {};
+  }
+}
+
+// Update summary cards and monthly overview
+function updateUI() {
+  totalIncomeEl.textContent = 'R' + income.toLocaleString();
+  totalExpenseEl.textContent = 'R' + expenses.toLocaleString();
+  balance = income - expenses;
+  balanceEl.textContent = 'R' + balance.toLocaleString();
+
+  // Budget overview
+  const totalBudget = Object.values(categoryBudgets).reduce((a, b) => a + b, 0);
+  const totalSpent = expenses;
+  const remaining = totalBudget - totalSpent;
+  budgetLimitEl.textContent = 'R' + totalBudget.toLocaleString();
+  budgetRemainingEl.textContent = 'R' + remaining.toLocaleString();
+
+  // Progress bar (percentage of budget used)
+  const percentUsed = totalBudget > 0 ? (totalSpent / totalBudget) * 100 : 0;
+  if (budgetProgressEl) {
+    budgetProgressEl.style.width = Math.min(percentUsed, 100) + '%';
+  }
+
+  // Update transaction list
+  transactionListEl.innerHTML = '';
+  if (transactions.length === 0) {
+    transactionListEl.innerHTML = '<li>No transactions yet. Add some!</li>';
+  } else {
+    // Show last 10 transactions, newest first
+    transactions.slice().reverse().slice(0, 10).forEach(t => {
+      const li = document.createElement('li');
+      const sign = t.type === 'income' ? '+' : '-';
+      const amountClass = t.type === 'income' ? 'income-amount' : 'expense-amount';
+      li.innerHTML = `
+        <div class="transaction-item">
+          <span class="transaction-desc">${t.description}</span>
+          <span class="transaction-date">${formatDisplayDate(t.date)}</span>
+          <span class="${amountClass}">${sign}R${t.amount.toLocaleString()}</span>
+        </div>
+      `;
+      transactionListEl.appendChild(li);
+    });
+  }
+
+  // Update mini calendar (mark days with transactions)
+  renderMiniCalendar();
+}
+
+// Render mini calendar (1-31) with indicators for days with transactions
+function renderMiniCalendar() {
+  if (!miniCalendarEl) return;
+  const now = new Date();
+  const year = now.getFullYear();
+  const month = now.getMonth() + 1; // 1-12
+  const daysInMonth = new Date(year, month, 0).getDate();
+
+  // Get set of days that have any transaction (income or expense)
+  const daysWithTransactions = new Set();
+  transactions.forEach(t => {
+    if (t.date) {
+      const [y, m, d] = t.date.split('-').map(Number);
+      if (y === year && m === month) {
+        daysWithTransactions.add(d);
+      }
+    }
+  });
+
+  let html = '';
+  for (let day = 1; day <= daysInMonth; day++) {
+    const hasTransaction = daysWithTransactions.has(day);
+    html += `<span class="${hasTransaction ? 'has-transaction' : ''}">${day}</span>`;
+  }
+  miniCalendarEl.innerHTML = html;
 }
 
 // ======================
-// Fallback modal HTML for Income
+// Navigation
 // ======================
+document.getElementById('monthlyBreakdownBtn')?.addEventListener('click', () => {
+  window.location.href = 'monthly-breakdown.html';
+});
+
+document.getElementById('logoutBtn')?.addEventListener('click', () => {
+  window.location.href = 'login.html';
+});
+
+// ======================
+// Modal loading (income, expense)
+// ======================
+
+// Fallback modal HTML for Income
 const fallbackIncomeModalHTML = `
 <div id="incomeModal" class="modal">
   <div class="modal-content">
@@ -126,9 +189,7 @@ const fallbackIncomeModalHTML = `
 </div>
 `;
 
-// ======================
 // Fallback modal HTML for Expense
-// ======================
 const fallbackExpenseModalHTML = `
 <div id="expenseModal" class="modal">
   <div class="modal-content">
@@ -172,10 +233,15 @@ const fallbackExpenseModalHTML = `
 </div>
 `;
 
-// ======================
-// Generic modal loader (appends without destroying)
-// ======================
-function loadModal(modalPath, containerId, fallbackHTML, callback) {
+// Generic modal loader – prevents duplicates
+function loadModal(modalId, modalPath, containerId, fallbackHTML, callback) {
+  // Check if modal already exists
+  if (document.getElementById(modalId)) {
+    console.log(`Modal ${modalId} already exists, skipping load.`);
+    if (callback) callback();
+    return;
+  }
+
   fetch(modalPath)
     .then(response => {
       if (!response.ok) throw new Error(`HTTP ${response.status}`);
@@ -186,15 +252,13 @@ function loadModal(modalPath, containerId, fallbackHTML, callback) {
       if (callback) callback();
     })
     .catch(error => {
-      console.warn('Fetch failed, using fallback modal. Error:', error);
+      console.warn(`Fetch failed for ${modalPath}, using fallback. Error:`, error);
       document.getElementById(containerId).insertAdjacentHTML('beforeend', fallbackHTML);
       if (callback) callback();
     });
 }
 
-// ======================
-// Income Modal initialization
-// ======================
+// Initialize Income Modal
 function initIncomeModal() {
   const modal = document.getElementById('incomeModal');
   const addIncomeBtn = document.getElementById('addIncomeBtn');
@@ -202,12 +266,19 @@ function initIncomeModal() {
   const clearBtn = document.querySelector('#incomeModal .btn-clear');
   const cancelBtn = document.querySelector('#incomeModal .btn-cancel');
 
-  if (!modal || !addIncomeBtn || !form) {
-    console.error('Income modal elements missing');
+  if (!modal) {
+    console.warn('Income modal element missing');
+    return;
+  }
+  if (!addIncomeBtn) {
+    console.warn('Add Income button not found');
+    return;
+  }
+  if (!form) {
+    console.warn('Income form not found');
     return;
   }
 
-  // Set today's date
   const today = new Date();
   const y = today.getFullYear();
   const m = String(today.getMonth() + 1).padStart(2, '0');
@@ -248,23 +319,19 @@ function initIncomeModal() {
       return;
     }
 
-    // Add to local data
-    income += amount;
+    const transactions = JSON.parse(localStorage.getItem('budgetflow_transactions') || '[]');
     transactions.push({ type: 'income', amount, description, date, category });
-    saveTransactions();
-    updateUI();
+    localStorage.setItem('budgetflow_transactions', JSON.stringify(transactions));
 
-    // Reset form
     form.reset();
     if (dateInput) dateInput.value = `${y}-${m}-${d}`;
     modal.style.display = 'none';
     alert('Income added!');
+    window.location.reload();
   });
 }
 
-// ======================
-// Expense Modal initialization
-// ======================
+// Initialize Expense Modal
 function initExpenseModal() {
   const modal = document.getElementById('expenseModal');
   const addExpenseBtn = document.getElementById('addExpenseBtn');
@@ -272,12 +339,19 @@ function initExpenseModal() {
   const clearBtn = document.querySelector('#expenseModal .btn-clear');
   const cancelBtn = document.querySelector('#expenseModal .btn-cancel');
 
-  if (!modal || !addExpenseBtn || !form) {
-    console.error('Expense modal elements missing');
+  if (!modal) {
+    console.warn('Expense modal element missing');
+    return;
+  }
+  if (!addExpenseBtn) {
+    console.warn('Add Expense button not found');
+    return;
+  }
+  if (!form) {
+    console.warn('Expense form not found');
     return;
   }
 
-  // Set today's date
   const today = new Date();
   const y = today.getFullYear();
   const m = String(today.getMonth() + 1).padStart(2, '0');
@@ -318,52 +392,37 @@ function initExpenseModal() {
       return;
     }
 
-    // Add to local data
-    expenses += amount;
+    const transactions = JSON.parse(localStorage.getItem('budgetflow_transactions') || '[]');
     transactions.push({ type: 'expense', amount, description, date, category });
-    saveTransactions();
-    updateUI();
+    localStorage.setItem('budgetflow_transactions', JSON.stringify(transactions));
 
-    // Reset form
     form.reset();
     if (dateInput) dateInput.value = `${y}-${m}-${d}`;
     modal.style.display = 'none';
     alert('Expense added!');
+    window.location.reload();
   });
 }
-
-// ======================
-// Navigation
-// ======================
-document.getElementById('monthlyBreakdownBtn')?.addEventListener('click', () => {
-  window.location.href = 'monthly-breakdown.html';
-});
-
-document.getElementById('logoutBtn')?.addEventListener('click', () => {
-  // Clear any session data if needed, then redirect to login
-  window.location.href = 'login.html';
-});
 
 // ======================
 // Main initialization
 // ======================
 document.addEventListener('DOMContentLoaded', () => {
-  // Load saved transactions
+  setCurrentMonthYear();
+  loadBudgets();
   loadTransactions();
-
-  // Initialize chart and UI
-  initChart();
   updateUI();
 
-  // Load and initialize modals
+  // Load modals
   loadModal(
+    'incomeModal',
     'components/modal-income.html',
     'modal-container',
     fallbackIncomeModalHTML,
     initIncomeModal
   );
-
   loadModal(
+    'expenseModal',
     'components/modal-expense.html',
     'modal-container',
     fallbackExpenseModalHTML,

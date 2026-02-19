@@ -293,10 +293,10 @@ body {
   color: #d1d5db;
 }
 
-.mini-calendar span.has-transaction {
+.mini-calendar span.current-day {
   background: #007bff;
-  color: white;
   font-weight: bold;
+  box-shadow: 0 0 0 2px #007bff; /* optional glow effect */
 }
 
 .view-all-link {

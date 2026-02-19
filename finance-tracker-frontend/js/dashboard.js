@@ -23,8 +23,8 @@ const miniCalendarEl = document.querySelector('.mini-calendar');
 // ======================
 function formatDisplayDate(dateString) {
   if (!dateString) return '';
-  const [ month, day] = dateString.split('-');
-  return `${month}/${day}`; // for transaction list
+  const [year, month, day] = dateString.split('-');
+  return `${year}/${month}/${day}`; // full date: YYYY/MM/DD
 }
 
 function setCurrentMonthYear() {
@@ -105,13 +105,16 @@ function updateUI() {
   renderMiniCalendar();
 }
 
-// Render mini calendar (1-31) with indicators for days with transactions
+// ======================
+// Render mini calendar (1-31) with indicators for days with transactions and current day
+// ======================
 function renderMiniCalendar() {
   if (!miniCalendarEl) return;
   const now = new Date();
   const year = now.getFullYear();
   const month = now.getMonth() + 1; // 1-12
   const daysInMonth = new Date(year, month, 0).getDate();
+  const todayDate = now.getDate();
 
   // Get set of days that have any transaction (income or expense)
   const daysWithTransactions = new Set();
@@ -126,8 +129,15 @@ function renderMiniCalendar() {
 
   let html = '';
   for (let day = 1; day <= daysInMonth; day++) {
-    const hasTransaction = daysWithTransactions.has(day);
-    html += `<span class="${hasTransaction ? 'has-transaction' : ''}">${day}</span>`;
+    let classes = [];
+    if (daysWithTransactions.has(day)) {
+      classes.push('has-transaction');
+    }
+    if (day === todayDate) {
+      classes.push('current-day');
+    }
+    const className = classes.join(' ');
+    html += `<span class="${className}">${day}</span>`;
   }
   miniCalendarEl.innerHTML = html;
 }
@@ -140,6 +150,7 @@ document.getElementById('monthlyBreakdownBtn')?.addEventListener('click', () => 
 });
 
 document.getElementById('logoutBtn')?.addEventListener('click', () => {
+  // Clear any session data if needed, then redirect to login
   window.location.href = 'login.html';
 });
 
@@ -327,7 +338,7 @@ function initIncomeModal() {
     if (dateInput) dateInput.value = `${y}-${m}-${d}`;
     modal.style.display = 'none';
     alert('Income added!');
-    window.location.reload();
+    window.location.reload(); // refresh to show updated data
   });
 }
 
@@ -400,7 +411,7 @@ function initExpenseModal() {
     if (dateInput) dateInput.value = `${y}-${m}-${d}`;
     modal.style.display = 'none';
     alert('Expense added!');
-    window.location.reload();
+    window.location.reload(); // refresh to show updated data
   });
 }
 

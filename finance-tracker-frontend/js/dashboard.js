@@ -3,9 +3,10 @@
 // ======================
 // Global variables
 // ======================
-let income = 0, expenses = 0, balance = 0;
 let transactions = [];
-let categoryBudgets = {}; // used for budget limit
+let categoryBudgets = {};
+let selectedDate = new Date(); // month/year being viewed
+let currentDate = new Date();   // real current date
 
 // DOM elements
 const totalIncomeEl = document.getElementById('totalIncome');
@@ -17,6 +18,8 @@ const budgetLimitEl = document.getElementById('budgetLimit');
 const budgetRemainingEl = document.getElementById('budgetRemaining');
 const budgetProgressEl = document.getElementById('budgetProgress');
 const miniCalendarEl = document.querySelector('.mini-calendar');
+const prevMonthBtn = document.getElementById('prevMonthBtn');
+const nextMonthBtn = document.getElementById('nextMonthBtn');
 
 // ======================
 // Helper functions
@@ -27,66 +30,85 @@ function formatDisplayDate(dateString) {
   return `${year}/${month}/${day}`; // full date: YYYY/MM/DD
 }
 
-function setCurrentMonthYear() {
-  const now = new Date();
+// Update displayed month/year based on selectedDate
+function updateMonthDisplay() {
   const monthNames = ['January', 'February', 'March', 'April', 'May', 'June',
     'July', 'August', 'September', 'October', 'November', 'December'];
-  const month = monthNames[now.getMonth()];
-  const year = now.getFullYear();
+  const month = monthNames[selectedDate.getMonth()];
+  const year = selectedDate.getFullYear();
   if (overviewMonthEl) overviewMonthEl.textContent = `${month} ${year}`;
+  
+  // Enable/disable next month button
+  if (nextMonthBtn) {
+    const nextMonthDate = new Date(selectedDate);
+    nextMonthDate.setMonth(selectedDate.getMonth() + 1);
+    nextMonthDate.setDate(1);
+    nextMonthBtn.disabled = nextMonthDate > currentDate;
+  }
 }
 
 // Load transactions from localStorage
 function loadTransactions() {
   const stored = localStorage.getItem('budgetflow_transactions');
-  if (stored) {
-    transactions = JSON.parse(stored);
-    income = transactions.filter(t => t.type === 'income').reduce((sum, t) => sum + t.amount, 0);
-    expenses = transactions.filter(t => t.type === 'expense').reduce((sum, t) => sum + t.amount, 0);
-  } else {
-    transactions = [];
-    income = 0;
-    expenses = 0;
-  }
+  transactions = stored ? JSON.parse(stored) : [];
 }
 
-// Load budgets from localStorage (to get total budget limit)
+// Load budgets from localStorage
 function loadBudgets() {
   const stored = localStorage.getItem('budgetflow_budgets');
-  if (stored) {
-    categoryBudgets = JSON.parse(stored);
-  } else {
-    categoryBudgets = {};
-  }
+  categoryBudgets = stored ? JSON.parse(stored) : {};
 }
 
-// Update summary cards and monthly overview
+// Filter transactions by selected month/year
+function filterTransactionsByMonth() {
+  const year = selectedDate.getFullYear();
+  const month = selectedDate.getMonth() + 1; // 1-12
+  return transactions.filter(t => {
+    if (!t.date) return false;
+    const [y, m] = t.date.split('-').map(Number);
+    return y === year && m === month;
+  });
+}
+
+// Calculate totals for filtered transactions
+function calculateTotals(filtered) {
+  let totalIncome = 0, totalExpense = 0;
+  filtered.forEach(t => {
+    if (t.type === 'income') totalIncome += t.amount;
+    else totalExpense += t.amount;
+  });
+  return { totalIncome, totalExpense };
+}
+
+// Update summary cards, budget, transaction list, and calendar
 function updateUI() {
-  totalIncomeEl.textContent = 'R' + income.toLocaleString();
-  totalExpenseEl.textContent = 'R' + expenses.toLocaleString();
-  balance = income - expenses;
+  const filtered = filterTransactionsByMonth();
+  const { totalIncome, totalExpense } = calculateTotals(filtered);
+  const balance = totalIncome - totalExpense;
+
+  totalIncomeEl.textContent = 'R' + totalIncome.toLocaleString();
+  totalExpenseEl.textContent = 'R' + totalExpense.toLocaleString();
   balanceEl.textContent = 'R' + balance.toLocaleString();
 
-  // Budget overview
+  // Budget overview (global budgets)
   const totalBudget = Object.values(categoryBudgets).reduce((a, b) => a + b, 0);
-  const totalSpent = expenses;
+  const totalSpent = totalExpense;
   const remaining = totalBudget - totalSpent;
   budgetLimitEl.textContent = 'R' + totalBudget.toLocaleString();
   budgetRemainingEl.textContent = 'R' + remaining.toLocaleString();
 
-  // Progress bar (percentage of budget used)
+  // Progress bar
   const percentUsed = totalBudget > 0 ? (totalSpent / totalBudget) * 100 : 0;
   if (budgetProgressEl) {
     budgetProgressEl.style.width = Math.min(percentUsed, 100) + '%';
   }
 
-  // Update transaction list
+  // Transaction list (last 10, newest first)
   transactionListEl.innerHTML = '';
-  if (transactions.length === 0) {
+  if (filtered.length === 0) {
     transactionListEl.innerHTML = '<li>No transactions yet. Add some!</li>';
   } else {
-    // Show last 10 transactions, newest first
-    transactions.slice().reverse().slice(0, 10).forEach(t => {
+    filtered.slice().reverse().slice(0, 10).forEach(t => {
       const li = document.createElement('li');
       const sign = t.type === 'income' ? '+' : '-';
       const amountClass = t.type === 'income' ? 'income-amount' : 'expense-amount';
@@ -101,24 +123,22 @@ function updateUI() {
     });
   }
 
-  // Update mini calendar (mark days with transactions)
-  renderMiniCalendar();
+  // Mini calendar
+  renderMiniCalendar(filtered);
 }
 
-// ======================
-// Render mini calendar (1-31) with indicators for days with transactions and current day
-// ======================
-function renderMiniCalendar() {
+// Render mini calendar for selected month
+function renderMiniCalendar(filtered) {
   if (!miniCalendarEl) return;
-  const now = new Date();
-  const year = now.getFullYear();
-  const month = now.getMonth() + 1; // 1-12
+  const year = selectedDate.getFullYear();
+  const month = selectedDate.getMonth() + 1;
   const daysInMonth = new Date(year, month, 0).getDate();
-  const todayDate = now.getDate();
+  const todayDate = currentDate.getDate();
+  const isCurrentMonth = (year === currentDate.getFullYear() && month === currentDate.getMonth() + 1);
 
-  // Get set of days that have any transaction (income or expense)
+  // Days with transactions
   const daysWithTransactions = new Set();
-  transactions.forEach(t => {
+  filtered.forEach(t => {
     if (t.date) {
       const [y, m, d] = t.date.split('-').map(Number);
       if (y === year && m === month) {
@@ -129,30 +149,47 @@ function renderMiniCalendar() {
 
   let html = '';
   for (let day = 1; day <= daysInMonth; day++) {
-    let classes = [];
-    if (daysWithTransactions.has(day)) {
-      classes.push('has-transaction');
+    if (isCurrentMonth && day > todayDate) {
+      // Future days – dimmed
+      html += `<span class="future-day">${day}</span>`;
+    } else {
+      let classes = [];
+      if (daysWithTransactions.has(day)) classes.push('has-transaction');
+      if (isCurrentMonth && day === todayDate) classes.push('current-day');
+      const className = classes.join(' ');
+      html += `<span class="${className}">${day}</span>`;
     }
-    if (day === todayDate) {
-      classes.push('current-day');
-    }
-    const className = classes.join(' ');
-    html += `<span class="${className}">${day}</span>`;
   }
   miniCalendarEl.innerHTML = html;
+}
+
+// Change month by delta
+function changeMonth(delta) {
+  selectedDate.setMonth(selectedDate.getMonth() + delta);
+  // Ensure not beyond current month
+  if (selectedDate > currentDate) {
+    selectedDate = new Date(currentDate);
+  }
+  updateMonthDisplay();
+  updateUI();
 }
 
 // ======================
 // Navigation
 // ======================
 document.getElementById('monthlyBreakdownBtn')?.addEventListener('click', () => {
-  window.location.href = 'monthly-breakdown.html';
+  const year = selectedDate.getFullYear();
+  const month = selectedDate.getMonth() + 1;
+  window.location.href = `monthly-breakdown.html?year=${year}&month=${month}`;
 });
 
 document.getElementById('logoutBtn')?.addEventListener('click', () => {
-  // Clear any session data if needed, then redirect to login
   window.location.href = 'login.html';
 });
+
+// Month navigation buttons
+prevMonthBtn?.addEventListener('click', () => changeMonth(-1));
+nextMonthBtn?.addEventListener('click', () => changeMonth(1));
 
 // ======================
 // Modal loading (income, expense)
@@ -246,7 +283,6 @@ const fallbackExpenseModalHTML = `
 
 // Generic modal loader – prevents duplicates
 function loadModal(modalId, modalPath, containerId, fallbackHTML, callback) {
-  // Check if modal already exists
   if (document.getElementById(modalId)) {
     console.log(`Modal ${modalId} already exists, skipping load.`);
     if (callback) callback();
@@ -338,7 +374,7 @@ function initIncomeModal() {
     if (dateInput) dateInput.value = `${y}-${m}-${d}`;
     modal.style.display = 'none';
     alert('Income added!');
-    window.location.reload(); // refresh to show updated data
+    window.location.reload();
   });
 }
 
@@ -411,7 +447,7 @@ function initExpenseModal() {
     if (dateInput) dateInput.value = `${y}-${m}-${d}`;
     modal.style.display = 'none';
     alert('Expense added!');
-    window.location.reload(); // refresh to show updated data
+    window.location.reload();
   });
 }
 
@@ -419,9 +455,13 @@ function initExpenseModal() {
 // Main initialization
 // ======================
 document.addEventListener('DOMContentLoaded', () => {
-  setCurrentMonthYear();
+  // Set selectedDate to current date initially
+  selectedDate = new Date();
+  currentDate = new Date();
+
   loadBudgets();
   loadTransactions();
+  updateMonthDisplay();
   updateUI();
 
   // Load modals

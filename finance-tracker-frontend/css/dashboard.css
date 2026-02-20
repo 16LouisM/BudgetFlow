@@ -235,9 +235,44 @@ body {
   border-radius: 16px;
 }
 
-.monthly-overview h2 {
-  margin-bottom: 20px;
+.month-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 15px;
+}
+
+.month-header h2 {
   font-size: 18px;
+  margin: 0;
+}
+
+.month-nav {
+  display: flex;
+  gap: 10px;
+}
+
+.month-nav button {
+  background: #374151;
+  border: none;
+  color: white;
+  width: 30px;
+  height: 30px;
+  border-radius: 6px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 0.2s;
+}
+
+.month-nav button:hover:not(:disabled) {
+  background: #4b5563;
+}
+
+.month-nav button:disabled {
+  opacity: 0.3;
+  cursor: not-allowed;
 }
 
 .budget-info {
@@ -293,10 +328,17 @@ body {
   color: #d1d5db;
 }
 
+
+
 .mini-calendar span.current-day {
   background: #007bff;
   font-weight: bold;
-  box-shadow: 0 0 0 2px #007bff; /* optional glow effect */
+  box-shadow: 0 0 0 2px #007bff;
+}
+
+.mini-calendar span.future-day {
+  opacity: 0.3;
+  background: #2d3748;
 }
 
 .view-all-link {

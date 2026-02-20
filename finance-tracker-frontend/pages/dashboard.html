@@ -74,15 +74,21 @@
 
         <!-- Monthly Overview Card -->
         <section class="monthly-overview">
-          <h2>Monthly Overview – <span id="overviewMonth">April 2024</span></h2>
+          <div class="month-header">
+            <h2>Monthly Overview – <span id="overviewMonth">April 2024</span></h2>
+            <div class="month-nav">
+              <button id="prevMonthBtn" title="Previous month"><i class="fas fa-chevron-left"></i></button>
+              <button id="nextMonthBtn" title="Next month"><i class="fas fa-chevron-right"></i></button>
+            </div>
+          </div>
           <div class="budget-info">
             <div class="budget-limit">
               <span>Budget Limit:</span>
-              <strong id="budgetLimit">R10,000</strong>
+              <strong id="budgetLimit">R0</strong>
             </div>
             <div class="budget-remaining">
               <span>Remaining:</span>
-              <strong id="budgetRemaining">R2,500</strong>
+              <strong id="budgetRemaining">R0</strong>
             </div>
           </div>
           <!-- Progress bar -->

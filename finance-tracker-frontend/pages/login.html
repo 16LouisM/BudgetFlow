@@ -8,20 +8,31 @@
 </head>
 <body>
 
-    <!-- Background Logo (will be used as CSS background) -->
-    <!-- No separate img tag needed – we'll set it in CSS -->
-
-    <!-- Login Card -->
     <div class="login-card">
         <h2>Welcome Back</h2>
+
         <form id="loginForm">
             <input type="email" id="email" placeholder="Email" required>
             <input type="password" id="password" placeholder="Password" required>
+
             <p id="errorMsg" class="error-message"></p>
+
             <button type="submit">Login</button>
         </form>
+
+        <!-- Divider -->
+        <div class="divider">
+            <span>OR</span>
+        </div>
+
+        <!-- Google Login Button -->
+        <button type="button" id="googleLoginBtn" class="google-btn">
+            Sign in with Google
+        </button>
     </div>
 
-    <script src="../js/auth.js"></script>
+    <!-- IMPORTANT: Must be type="module" for Firebase -->
+    <script type="module" src="../js/auth.js"></script>
+
 </body>
 </html>

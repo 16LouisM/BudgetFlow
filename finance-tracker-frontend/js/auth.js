@@ -11,11 +11,11 @@ import {
    FIREBASE CONFIG
 ========================= */
 const firebaseConfig = {
-    apiKey: "YOUR_API_KEY",
-    authDomain: "YOUR_AUTH_DOMAIN",
-    projectId: "YOUR_PROJECT_ID",
-    storageBucket: "YOUR_STORAGE_BUCKET",
-    messagingSenderId: "YOUR_SENDER_ID",
+    apiKey: "AIzaSyBHAdhAZs_93HA7wc5vlhy5I9COiqmYO8Q",
+    authDomain: "budgetflow-ab829.firebaseapp.com",
+    projectId: "budgetflow-ab829",
+    storageBucket: "budgetflow-ab829.firebasestorage.app",
+    messagingSenderId: "1:1002683229140:web:449ac709cb722fb78bac41",
     appId: "YOUR_APP_ID"
 };
 

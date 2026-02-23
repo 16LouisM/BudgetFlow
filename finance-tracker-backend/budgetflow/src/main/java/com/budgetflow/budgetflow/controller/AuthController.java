@@ -11,6 +11,8 @@ import java.util.Optional;
 @RequestMapping("/api/auth")
 public class AuthController {
 
+    private static final String INVALID_CREDENTIALS = "Email or password is incorrect!";
+
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
 
@@ -25,7 +27,7 @@ public class AuthController {
     public String register(@RequestBody User user) {
 
         if (userRepository.findByEmail(user.getEmail()).isPresent()) {
-            return "Email already exists!";
+            return "Email already registered.";
         }
 
         user.setPassword(passwordEncoder.encode(user.getPassword()));
@@ -42,7 +44,7 @@ public class AuthController {
                 userRepository.findByEmail(loginRequest.getEmail());
 
         if (userOptional.isEmpty()) {
-            return "User not found!";
+            return INVALID_CREDENTIALS;
         }
 
         User user = userOptional.get();
@@ -53,7 +55,7 @@ public class AuthController {
 
             return "Login successful!";
         } else {
-            return "Invalid password!";
+            return INVALID_CREDENTIALS;
         }
     }
 }

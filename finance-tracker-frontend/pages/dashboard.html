@@ -123,6 +123,10 @@
 <div id="modal-container"></div>
 
 <script src="../js/dashboard.js"></script>
-
+<script>
+    if (localStorage.getItem("isLoggedIn") !== "true") {
+        window.location.href = "login.html";
+    }
+</script>
 </body>
 </html>

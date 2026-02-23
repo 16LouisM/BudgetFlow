@@ -7,6 +7,8 @@ document.getElementById("loginForm")
     const password = document.getElementById("password").value;
     const errorMsg = document.getElementById("errorMsg");
 
+    errorMsg.textContent = "";
+
     try {
         const response = await fetch("http://localhost:8080/api/auth/login", {
             method: "POST",
@@ -22,7 +24,13 @@ document.getElementById("loginForm")
         const result = await response.text();
 
         if (result === "Login successful!") {
+
+            // Store login state (temporary solution)
+            localStorage.setItem("isLoggedIn", "true");
+            localStorage.setItem("userEmail", email);
+
             window.location.href = "dashboard.html";
+
         } else {
             errorMsg.textContent = result;
         }

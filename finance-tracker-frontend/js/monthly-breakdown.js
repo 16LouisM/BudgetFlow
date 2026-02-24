@@ -58,8 +58,8 @@ function saveTransactions() {
 function setCurrentMonthYear() {
   const now = new Date();
   const monthNames = [
-    'January','February','March','April','May','June',
-    'July','August','September','October','November','December'
+    'January', 'February', 'March', 'April', 'May', 'June',
+    'July', 'August', 'September', 'October', 'November', 'December'
   ];
 
   const currentMonth = monthNames[now.getMonth()];
@@ -115,8 +115,8 @@ function updateSummary(totalIncome, totalExpense, categorySpent) {
   totalExpenseEl.textContent = 'R' + totalExpense.toLocaleString();
   balanceEl.textContent = 'R' + balance.toLocaleString();
 
-  const totalBudget = Object.values(categoryBudgets).reduce((a,b)=>a+b,0);
-  const totalSpent = Object.values(categorySpent).reduce((a,b)=>a+b,0);
+  const totalBudget = Object.values(categoryBudgets).reduce((a, b) => a + b, 0);
+  const totalSpent = Object.values(categorySpent).reduce((a, b) => a + b, 0);
   const remaining = totalBudget - totalSpent;
 
   budgetRemainingEl.textContent = 'R' + remaining.toLocaleString();
@@ -128,7 +128,7 @@ function updateSummary(totalIncome, totalExpense, categorySpent) {
 
     if (remaining < 0) {
       messages.push(`🚨 You exceeded your total budget by R${Math.abs(remaining).toLocaleString()}.`);
-    } 
+    }
     else if (percentUsed >= 80) {
       messages.push(`⚠️ You have used ${percentUsed.toFixed(0)}% of your total monthly budget.`);
     }
@@ -150,11 +150,11 @@ function calculateBudgetStatus(spent, budget) {
   const remaining = budget - spent;
   const percentUsed = budget > 0 ? (spent / budget) * 100 : 0;
 
-  if (budget === 0) return { status:'No budget', className:'' };
-  if (remaining < 0) return { status:'Exceeded', className:'exceeded' };
-  if (percentUsed >= 80) return { status:'Warning', className:'warning' };
+  if (budget === 0) return { status: 'No budget', className: '' };
+  if (remaining < 0) return { status: 'Exceeded', className: 'exceeded' };
+  if (percentUsed >= 80) return { status: 'Warning', className: 'warning' };
 
-  return { status:'On track', className:'good' };
+  return { status: 'On track', className: 'good' };
 }
 
 // ======================================================
@@ -163,7 +163,7 @@ function calculateBudgetStatus(spent, budget) {
 function renderBudgetTable(categorySpent) {
 
   let html = '';
-  let highest = { name:'', spent:0 };
+  let highest = { name: '', spent: 0 };
 
   expenseCategories.forEach(cat => {
     const spent = categorySpent[cat];
@@ -172,15 +172,15 @@ function renderBudgetTable(categorySpent) {
     const status = calculateBudgetStatus(spent, budget);
 
     if (spent > highest.spent)
-      highest = { name:cat, spent };
+      highest = { name: cat, spent };
 
     html += `
       <tr>
         <td>${cat}</td>
-        <td>${budget ? 'R'+budget.toLocaleString() : '-'}</td>
+        <td>${budget ? 'R' + budget.toLocaleString() : '-'}</td>
         <td>R${spent.toLocaleString()}</td>
-        <td class="${remaining < 0 ? 'exceeded':''}">
-          ${budget ? 'R'+remaining.toLocaleString() : '-'}
+        <td class="${remaining < 0 ? 'exceeded' : ''}">
+          ${budget ? 'R' + remaining.toLocaleString() : '-'}
         </td>
         <td class="${status.className}">${status.status}</td>
       </tr>
@@ -208,18 +208,18 @@ function renderChart(categorySpent) {
   if (expenseChart) expenseChart.destroy();
 
   expenseChart = new Chart(expenseChartCtx, {
-    type:'pie',
-    data:{
+    type: 'pie',
+    data: {
       labels,
-      datasets:[{
+      datasets: [{
         data,
-        backgroundColor:[
-          '#FF6384','#36A2EB','#FFCE56','#4BC0C0','#9966FF',
-          '#FF9F40','#E7E9ED','#76A346','#C45850','#6A4C9C','#8B4513'
+        backgroundColor: [
+          '#FF6384', '#36A2EB', '#FFCE56', '#4BC0C0', '#9966FF',
+          '#FF9F40', '#E7E9ED', '#76A346', '#C45850', '#6A4C9C', '#8B4513'
         ]
       }]
     },
-    options:{ responsive:true }
+    options: { responsive: true }
   });
 }
 
@@ -228,13 +228,17 @@ function renderChart(categorySpent) {
 // ======================================================
 function initSidebarNavigation() {
 
-  document.getElementById('dashboardBtn')?.addEventListener('click', ()=>{
+  document.getElementById('dashboardBtn')?.addEventListener('click', () => {
     window.location.href = 'dashboard.html';
   });
 
-  document.getElementById('logoutBtn')?.addEventListener('click', ()=>{
-    localStorage.removeItem('budgetflow_loggedInUser');
-    window.location.href = 'login.html';
+  document.getElementById('logoutBtn')?.addEventListener('click', () => {
+
+    // Clear login flag
+    localStorage.removeItem('isLoggedIn');
+
+    // Replace history so user can't go back
+    window.location.replace('login.html');
   });
 
   // These will now open the modals (handled by initModals after loading)
@@ -521,7 +525,7 @@ function initPage() {
 // ======================================================
 // START
 // ======================================================
-document.addEventListener('DOMContentLoaded', ()=>{
+document.addEventListener('DOMContentLoaded', () => {
   initPage();
   initSidebarNavigation();
 

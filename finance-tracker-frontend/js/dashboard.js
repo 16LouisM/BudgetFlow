@@ -183,10 +183,18 @@ document.getElementById('monthlyBreakdownBtn')?.addEventListener('click', () => 
   window.location.href = `monthly-breakdown.html?year=${year}&month=${month}`;
 });
 
-document.getElementById('logoutBtn')?.addEventListener('click', () => {
-  window.location.href = 'login.html';
-});
+document.getElementById("logoutBtn").addEventListener("click", function () {
 
+    // Clear login
+    localStorage.removeItem("isLoggedIn");
+
+    // Replace current history entry
+    window.history.replaceState(null, null, "login.html");
+
+    // Force hard redirect
+    window.location.href = "login.html";
+
+});
 // Month navigation buttons
 prevMonthBtn?.addEventListener('click', () => changeMonth(-1));
 nextMonthBtn?.addEventListener('click', () => changeMonth(1));

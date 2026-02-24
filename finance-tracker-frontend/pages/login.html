@@ -5,7 +5,27 @@
     <meta charset="UTF-8">
     <title>BudgetFlow | Login</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <!-- Prevent caching -->
+    <meta http-equiv="Cache-Control" content="no-store" />
+    <meta http-equiv="Pragma" content="no-cache" />
+    <meta http-equiv="Expires" content="0" />
+
     <link rel="stylesheet" href="../css/styles.css">
+
+    <script>
+        // 🔐 If already logged in, prevent going back to login
+        if (localStorage.getItem("isLoggedIn") === "true") {
+            window.location.replace("dashboard.html");
+        }
+
+        // 🔐 Handle browser back/forward cache restore
+        window.addEventListener("pageshow", function (event) {
+            if (event.persisted) {
+                window.location.reload();
+            }
+        });
+    </script>
 </head>
 
 <body>
@@ -30,5 +50,4 @@
     <script src="../js/auth-backend.js"></script>
 
 </body>
-
 </html>

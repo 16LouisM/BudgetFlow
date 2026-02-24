@@ -1,133 +1,160 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>BudgetFlow – Monthly Breakdown</title>
+
+  <!-- 🔐 Disable Cache -->
+  <meta http-equiv="Cache-Control" content="no-store" />
+  <meta http-equiv="Pragma" content="no-cache" />
+  <meta http-equiv="Expires" content="0" />
+
+  <!-- 🔐 Auth Protection -->
+  <script>
+    function protectPage() {
+      if (localStorage.getItem("isLoggedIn") !== "true") {
+        window.location.replace("login.html");
+      }
+    }
+
+    protectPage();
+
+    window.addEventListener("pageshow", function (event) {
+      if (event.persisted) {
+        protectPage();
+      }
+    });
+  </script>
+
   <link rel="stylesheet" href="../css/dashboard.css">
   <link rel="stylesheet" href="../css/monthly-breakdown.css">
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
 </head>
+</head>
+
 <body>
 
-<div class="dashboard">
+  <div class="dashboard">
 
-  <!-- Sidebar -->
-  <aside class="sidebar">
-    <div class="sidebar-header">
-      <img src="../assets/images/login-background.png" alt="BudgetFlow Logo" class="sidebar-logo">
-      <h2>BudgetFlow</h2>
-    </div>
-
-    <ul class="menu">
-      <!-- First: Add Income -->
-      <li id="addIncomeBtn">
-        <i class="fas fa-wallet"></i>
-        <span>Add Income</span>
-      </li>
-      <!-- Second: Add Expense -->
-      <li id="addExpenseBtn">
-        <i class="fas fa-credit-card"></i>
-        <span>Add Expense</span>
-      </li>
-      <!-- Third: Dashboard (replaces Monthly Breakdown) -->
-      <li id="dashboardBtn">
-        <i class="fas fa-tachometer-alt"></i>
-        <span>Dashboard</span>
-      </li>
-      <!-- Fourth: Logout -->
-      <li id="logoutBtn">
-        <i class="fas fa-sign-out-alt"></i>
-        <span>Logout</span>
-      </li>
-    </ul>
-
-    <div class="sidebar-footer">
-      <p>🔐 Bank-Level Encryption</p>
-      <p>OAuth 2.0 Secured</p>
-      <small>© 2026 BudgetFlow</small>
-    </div>
-  </aside>
-
-  <!-- Main Content -->
-  <main class="main-content">
-    <header class="topbar">
-      <h1>Monthly Breakdown</h1>
-      <p id="monthDisplay">April 2024</p>
-    </header>
-
-    <!-- Summary Cards -->
-    <section class="cards">
-      <div class="card income">
-        <h3><i class="fas fa-arrow-up"></i> Total Income</h3>
-        <p id="totalIncome">R0</p>
+    <!-- Sidebar -->
+    <aside class="sidebar">
+      <div class="sidebar-header">
+        <img src="../assets/images/login-background.png" alt="BudgetFlow Logo" class="sidebar-logo">
+        <h2>BudgetFlow</h2>
       </div>
-      <div class="card expense">
-        <h3><i class="fas fa-arrow-down"></i> Total Expenses</h3>
-        <p id="totalExpense">R0</p>
-      </div>
-      <div class="card balance">
-        <h3><i class="fas fa-scale-balanced"></i> Balance</h3>
-        <p id="balance">R0</p>
-      </div>
-      <div class="card budget-remaining">
-        <h3><i class="fas fa-piggy-bank"></i> Budget Remaining</h3>
-        <p id="budgetRemaining">R0</p>
-      </div>
-    </section>
 
-    <!-- Pie Chart and Budget Overview -->
-    <div class="breakdown-grid">
-      <section class="chart-section">
-        <h2>Expense Breakdown – <span id="chartMonth">April 2024</span></h2>
-        <canvas id="expenseChart"></canvas>
-        <div id="budgetMessages" class="budget-messages"></div>
-      </section>
+      <ul class="menu">
+        <!-- First: Add Income -->
+        <li id="addIncomeBtn">
+          <i class="fas fa-wallet"></i>
+          <span>Add Income</span>
+        </li>
+        <!-- Second: Add Expense -->
+        <li id="addExpenseBtn">
+          <i class="fas fa-credit-card"></i>
+          <span>Add Expense</span>
+        </li>
+        <!-- Third: Dashboard (replaces Monthly Breakdown) -->
+        <li id="dashboardBtn">
+          <i class="fas fa-tachometer-alt"></i>
+          <span>Dashboard</span>
+        </li>
+        <!-- Fourth: Logout -->
+        <li id="logoutBtn">
+          <i class="fas fa-sign-out-alt"></i>
+          <span>Logout</span>
+        </li>
+      </ul>
 
-      <!-- Budget Table with Set Budgets button -->
-      <section class="budget-table-section">
-        <div class="budget-header">
-          <h2>Budget vs Actual</h2>
+      <div class="sidebar-footer">
+        <p>🔐 Bank-Level Encryption</p>
+        <p>OAuth 2.0 Secured</p>
+        <small>© 2026 BudgetFlow</small>
+      </div>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="main-content">
+      <header class="topbar">
+        <h1>Monthly Breakdown</h1>
+        <p id="monthDisplay">April 2024</p>
+      </header>
+
+      <!-- Summary Cards -->
+      <section class="cards">
+        <div class="card income">
+          <h3><i class="fas fa-arrow-up"></i> Total Income</h3>
+          <p id="totalIncome">R0</p>
         </div>
-        <table class="budget-table">
-          <thead>
-            <tr>
-              <th>Category</th>
-              <th>Budget (R)</th>
-              <th>Spent (R)</th>
-              <th>Remaining (R)</th>
-              <th>Status</th>
-            </tr>
-          </thead>
-          <tbody id="budgetTableBody">
-            <!-- Populated by JS -->
-          </tbody>
-        </table>
+        <div class="card expense">
+          <h3><i class="fas fa-arrow-down"></i> Total Expenses</h3>
+          <p id="totalExpense">R0</p>
+        </div>
+        <div class="card balance">
+          <h3><i class="fas fa-scale-balanced"></i> Balance</h3>
+          <p id="balance">R0</p>
+        </div>
+        <div class="card budget-remaining">
+          <h3><i class="fas fa-piggy-bank"></i> Budget Remaining</h3>
+          <p id="budgetRemaining">R0</p>
+        </div>
       </section>
-    </div>
 
-    <!-- Spending Insights -->
-    <section class="insights">
-      <h2>Spending Insights</h2>
-      <div id="insightsContent"></div>
-    </section>
+      <!-- Pie Chart and Budget Overview -->
+      <div class="breakdown-grid">
+        <section class="chart-section">
+          <h2>Expense Breakdown – <span id="chartMonth">April 2024</span></h2>
+          <canvas id="expenseChart"></canvas>
+          <div id="budgetMessages" class="budget-messages"></div>
+        </section>
 
-    <!-- Mobile Footer Info -->
-    <div class="mobile-footer-info">
-      <p>🔐 Bank-Level Encryption</p>
-      <p>OAuth 2.0 Secured</p>
-      <small>© 2026 BudgetFlow</small>
-    </div>
-  </main>
-</div>
+        <!-- Budget Table with Set Budgets button -->
+        <section class="budget-table-section">
+          <div class="budget-header">
+            <h2>Budget vs Actual</h2>
+          </div>
+          <table class="budget-table">
+            <thead>
+              <tr>
+                <th>Category</th>
+                <th>Budget (R)</th>
+                <th>Spent (R)</th>
+                <th>Remaining (R)</th>
+                <th>Status</th>
+              </tr>
+            </thead>
+            <tbody id="budgetTableBody">
+              <!-- Populated by JS -->
+            </tbody>
+          </table>
+        </section>
+      </div>
 
-<!-- Modal Container -->
-<div id="modal-container"></div>
+      <!-- Spending Insights -->
+      <section class="insights">
+        <h2>Spending Insights</h2>
+        <div id="insightsContent"></div>
+      </section>
 
-<!-- Footer Container -->
-<div id="footer-container"></div>
+      <!-- Mobile Footer Info -->
+      <div class="mobile-footer-info">
+        <p>🔐 Bank-Level Encryption</p>
+        <p>OAuth 2.0 Secured</p>
+        <small>© 2026 BudgetFlow</small>
+      </div>
+    </main>
+  </div>
 
-<script src="../js/monthly-breakdown.js"></script>
+  <!-- Modal Container -->
+  <div id="modal-container"></div>
+
+  <!-- Footer Container -->
+  <div id="footer-container"></div>
+
+  <script src="../js/monthly-breakdown.js"></script>
 </body>
+
 </html>

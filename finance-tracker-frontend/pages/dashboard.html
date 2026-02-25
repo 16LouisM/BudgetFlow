@@ -13,25 +13,19 @@
 
   <!-- 🔐 Authentication Protection -->
   <script>
-      function protectDashboard() {
-          if (localStorage.getItem("isLoggedIn") !== "true") {
-
-              // Clear history stack
-              window.history.pushState(null, null, location.href);
-              window.history.go(1);
-
-              window.location.replace("login.html");
-          }
+    function protectDashboard() {
+      if (localStorage.getItem("isLoggedIn") !== "true") {
+        window.location.replace("login.html");
       }
+    }
 
-      protectDashboard();
+    protectDashboard();
 
-      // Protect against browser back/forward cache
-      window.addEventListener("pageshow", function (event) {
-          if (event.persisted) {
-              protectDashboard();
-          }
-      });
+    window.addEventListener("pageshow", function (event) {
+      if (event.persisted) {
+        protectDashboard();
+      }
+    });
   </script>
 
   <link rel="stylesheet" href="../css/dashboard.css">
@@ -41,117 +35,118 @@
 
 <body>
 
-<div class="dashboard">
+  <div class="dashboard">
 
-  <!-- Sidebar -->
-  <aside class="sidebar">
-    <div class="sidebar-header">
-      <img src="../assets/images/login-background.png" alt="BudgetFlow Logo" class="sidebar-logo">
-      <h2>BudgetFlow</h2>
-    </div>
+    <!-- Sidebar -->
+    <aside class="sidebar">
+      <div class="sidebar-header">
+        <img src="../assets/images/login-background.png" alt="BudgetFlow Logo" class="sidebar-logo">
+        <h2>BudgetFlow</h2>
+      </div>
 
-    <ul class="menu">
-      <li id="addIncomeBtn">
-        <i class="fas fa-wallet"></i>
-        <span>Add Income</span>
-      </li>
-      <li id="addExpenseBtn">
-        <i class="fas fa-credit-card"></i>
-        <span>Add Expense</span>
-      </li>
-      <li id="monthlyBreakdownBtn">
-        <i class="fas fa-chart-pie"></i>
-        <span>Monthly Breakdown</span>
-      </li>
-      <li id="logoutBtn">
-        <i class="fas fa-sign-out-alt"></i>
-        <span>Logout</span>
-      </li>
-    </ul>
+      <ul class="menu">
+        <li id="addIncomeBtn">
+          <i class="fas fa-wallet"></i>
+          <span>Add Income</span>
+        </li>
+        <li id="addExpenseBtn">
+          <i class="fas fa-credit-card"></i>
+          <span>Add Expense</span>
+        </li>
+        <li id="monthlyBreakdownBtn">
+          <i class="fas fa-chart-pie"></i>
+          <span>Monthly Breakdown</span>
+        </li>
+        <li id="logoutBtn">
+          <i class="fas fa-sign-out-alt"></i>
+          <span>Logout</span>
+        </li>
+      </ul>
 
-    <div class="sidebar-footer">
-      <p>🔐 Bank-Level Encryption</p>
-      <p>OAuth 2.0 Secured</p>
-      <small>© 2026 BudgetFlow</small>
-    </div>
-  </aside>
+      <div class="sidebar-footer">
+        <p>🔐 Bank-Level Encryption</p>
+        <p>OAuth 2.0 Secured</p>
+        <small>© 2026 BudgetFlow</small>
+      </div>
+    </aside>
 
-  <!-- Main Content -->
-  <main class="main-content">
-    <header class="topbar">
-      <h1>Dashboard</h1>
-      <p>Welcome back 👋</p>
-    </header>
+    <!-- Main Content -->
+    <main class="main-content">
+      <header class="topbar">
+        <h1>Dashboard</h1>
+        <p>Welcome back 👋</p>
+      </header>
 
-    <div class="content-wrapper">
+      <div class="content-wrapper">
 
-      <div class="left-column">
+        <div class="left-column">
 
-        <section class="cards">
-          <div class="card income">
-            <h3><i class="fas fa-arrow-up"></i> Total Income</h3>
-            <p id="totalIncome">R0</p>
-          </div>
-          <div class="card expense">
-            <h3><i class="fas fa-arrow-down"></i> Total Expenses</h3>
-            <p id="totalExpense">R0</p>
-          </div>
-          <div class="card balance">
-            <h3><i class="fas fa-scale-balanced"></i> Balance</h3>
-            <p id="balance">R0</p>
-          </div>
-        </section>
-
-        <section class="monthly-overview">
-          <div class="month-header">
-            <h2>Monthly Overview – <span id="overviewMonth">April 2024</span></h2>
-            <div class="month-nav">
-              <button id="prevMonthBtn" title="Previous month"><i class="fas fa-chevron-left"></i></button>
-              <button id="nextMonthBtn" title="Next month"><i class="fas fa-chevron-right"></i></button>
+          <section class="cards">
+            <div class="card income">
+              <h3><i class="fas fa-arrow-up"></i> Total Income</h3>
+              <p id="totalIncome">R0</p>
             </div>
-          </div>
-
-          <div class="budget-info">
-            <div class="budget-limit">
-              <span>Budget Limit:</span>
-              <strong id="budgetLimit">R0</strong>
+            <div class="card expense">
+              <h3><i class="fas fa-arrow-down"></i> Total Expenses</h3>
+              <p id="totalExpense">R0</p>
             </div>
-            <div class="budget-remaining">
-              <span>Remaining:</span>
-              <strong id="budgetRemaining">R0</strong>
+            <div class="card balance">
+              <h3><i class="fas fa-scale-balanced"></i> Balance</h3>
+              <p id="balance">R0</p>
             </div>
-          </div>
+          </section>
 
-          <div class="progress-bar-container">
-            <div class="progress-bar" id="budgetProgress"></div>
-          </div>
+          <section class="monthly-overview">
+            <div class="month-header">
+              <h2>Monthly Overview – <span id="overviewMonth">April 2024</span></h2>
+              <div class="month-nav">
+                <button id="prevMonthBtn" title="Previous month"><i class="fas fa-chevron-left"></i></button>
+                <button id="nextMonthBtn" title="Next month"><i class="fas fa-chevron-right"></i></button>
+              </div>
+            </div>
 
-          <div class="mini-calendar"></div>
+            <div class="budget-info">
+              <div class="budget-limit">
+                <span>Budget Limit:</span>
+                <strong id="budgetLimit">R0</strong>
+              </div>
+              <div class="budget-remaining">
+                <span>Remaining:</span>
+                <strong id="budgetRemaining">R0</strong>
+              </div>
+            </div>
 
-          <a href="monthly-breakdown.html" class="view-all-link">View All →</a>
+            <div class="progress-bar-container">
+              <div class="progress-bar" id="budgetProgress"></div>
+            </div>
+
+            <div class="mini-calendar"></div>
+
+            <a href="monthly-breakdown.html" class="view-all-link">View All →</a>
+          </section>
+
+        </div>
+
+        <section class="transactions">
+          <h2>Recent Transactions</h2>
+          <ul id="transactionList"></ul>
         </section>
 
       </div>
 
-      <section class="transactions">
-        <h2>Recent Transactions</h2>
-        <ul id="transactionList"></ul>
-      </section>
+      <div class="mobile-footer-info">
+        <p>🔐 Bank-Level Encryption</p>
+        <p>OAuth 2.0 Secured</p>
+        <small>© 2026 BudgetFlow</small>
+      </div>
 
-    </div>
+    </main>
+  </div>
 
-    <div class="mobile-footer-info">
-      <p>🔐 Bank-Level Encryption</p>
-      <p>OAuth 2.0 Secured</p>
-      <small>© 2026 BudgetFlow</small>
-    </div>
+  <div id="modal-container"></div>
 
-  </main>
-</div>
-
-<div id="modal-container"></div>
-
-<script src="../js/dashboard.js"></script>
+  <script src="../js/dashboard.js"></script>
 
 </body>
+
 </html>

@@ -14,15 +14,11 @@
     <link rel="stylesheet" href="../css/styles.css">
 
     <script>
-        // 🔐 If already logged in, prevent going back to login
-        if (localStorage.getItem("isLoggedIn") === "true") {
-            window.location.replace("dashboard.html");
-        }
+        document.addEventListener('DOMContentLoaded', () => {
+            const isLoggedIn = localStorage.getItem('isLoggedIn');
 
-        // 🔐 Handle browser back/forward cache restore
-        window.addEventListener("pageshow", function (event) {
-            if (event.persisted) {
-                window.location.reload();
+            if (isLoggedIn === 'true') {
+                window.location.replace = "../pages/dashboard.html"; // adjust path if needed
             }
         });
     </script>
@@ -50,4 +46,5 @@
     <script src="../js/auth-backend.js"></script>
 
 </body>
+
 </html>

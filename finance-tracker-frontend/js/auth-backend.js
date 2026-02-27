@@ -1,5 +1,5 @@
 // ===============================
-// AUTH BACKEND LOGIC
+// AUTH BACKEND LOGIC (UPDATED)
 // ===============================
 
 document.addEventListener("DOMContentLoaded", () => {
@@ -13,8 +13,6 @@ document.addEventListener("DOMContentLoaded", () => {
   // LOGIN
   // ===============================
   if (loginForm) {
-
-    console.log("Login form detected");
 
     loginForm.addEventListener("submit", async function (e) {
       e.preventDefault();
@@ -39,11 +37,13 @@ document.addEventListener("DOMContentLoaded", () => {
 
         if (response.ok) {
 
-          localStorage.setItem("budgetflow_session", JSON.stringify({
-            email: email
-          }));
+          // 🔥 CRITICAL SESSION STORAGE
+          localStorage.setItem("isLoggedIn", "true");
+          localStorage.setItem("currentUser", email);
 
-          window.location.href = "dashboard.html";
+          window.location.replace("dashboard.html");
+        } else if (errorMsg) {
+          errorMsg.textContent = result;
         }
 
       } catch (error) {
@@ -59,8 +59,6 @@ document.addEventListener("DOMContentLoaded", () => {
   // REGISTER
   // ===============================
   if (registerForm) {
-
-    console.log("Register form detected");
 
     registerForm.addEventListener("submit", async function (e) {
       e.preventDefault();
@@ -86,7 +84,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
         if (response.ok) {
           alert("Registration successful! Please login.");
-          window.location.href = "login.html";
+          window.location.replace("login.html");
         } else if (errorMsg) {
           errorMsg.textContent = result;
         }

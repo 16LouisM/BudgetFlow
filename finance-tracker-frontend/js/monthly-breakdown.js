@@ -1,6 +1,22 @@
 // ======================================================
-// BudgetFlow - Monthly Breakdown (Production Clean)
+// BudgetFlow - Monthly Breakdown (User-Specific Version)
 // ======================================================
+
+// ======================
+// AUTH CHECK
+// ======================
+const isLoggedIn = localStorage.getItem("isLoggedIn");
+const currentUser = localStorage.getItem("currentUser");
+
+if (isLoggedIn !== "true" || !currentUser) {
+  window.location.replace("../pages/login.html");
+}
+
+// ======================
+// USER-SPECIFIC STORAGE KEYS
+// ======================
+const TRANSACTION_KEY = `budgetflow_transactions_${currentUser}`;
+const BUDGET_KEY = `budgetflow_budgets_${currentUser}`;
 
 // ======================
 // GLOBAL VARIABLES
@@ -30,22 +46,22 @@ const insightsContent = document.getElementById('insightsContent');
 const budgetMessagesDiv = document.getElementById('budgetMessages');
 
 // ======================================================
-// STORAGE
+// STORAGE (USER-SPECIFIC)
 // ======================================================
 function loadBudgets() {
-  categoryBudgets = JSON.parse(localStorage.getItem('budgetflow_budgets')) || {};
+  categoryBudgets = JSON.parse(localStorage.getItem(BUDGET_KEY)) || {};
 }
 
 function saveBudgets() {
-  localStorage.setItem('budgetflow_budgets', JSON.stringify(categoryBudgets));
+  localStorage.setItem(BUDGET_KEY, JSON.stringify(categoryBudgets));
 }
 
 function loadTransactions() {
-  transactions = JSON.parse(localStorage.getItem('budgetflow_transactions')) || [];
+  transactions = JSON.parse(localStorage.getItem(TRANSACTION_KEY)) || [];
 }
 
 function saveTransactions() {
-  localStorage.setItem('budgetflow_transactions', JSON.stringify(transactions));
+  localStorage.setItem(TRANSACTION_KEY, JSON.stringify(transactions));
 }
 
 // ======================================================
@@ -193,7 +209,7 @@ function renderChart(categorySpent) {
 }
 
 // ======================================================
-// REFRESH VIEW (NEW)
+// REFRESH VIEW
 // ======================================================
 function refreshMonthlyView() {
   const monthly = filterCurrentMonthTransactions();
@@ -206,7 +222,7 @@ function refreshMonthlyView() {
 }
 
 // ======================================================
-// MODALS (CLEANED)
+// MODALS
 // ======================================================
 function initIncomeModal() {
   const modal = document.getElementById('incomeModal');
@@ -230,7 +246,6 @@ function initIncomeModal() {
 
     modal.style.display='none';
     form.reset();
-
     refreshMonthlyView();
   });
 }
@@ -257,7 +272,6 @@ function initExpenseModal() {
 
     modal.style.display='none';
     form.reset();
-
     refreshMonthlyView();
   });
 }
@@ -270,8 +284,37 @@ function initPage() {
   loadBudgets();
   loadTransactions();
   refreshMonthlyView();
+  initIncomeModal();
+  initExpenseModal();
+  initSidebarNavigation();
 }
 
-document.addEventListener('DOMContentLoaded', ()=>{
-  initPage();
-});
+document.addEventListener('DOMContentLoaded', initPage);
+
+// ======================
+// SIDEBAR NAVIGATION
+// ======================
+function initSidebarNavigation() {
+
+  document.getElementById("dashboardBtn")?.addEventListener("click", () => {
+    window.location.href = "dashboard.html";
+  });
+
+  document.getElementById("monthlyBreakdownBtn")?.addEventListener("click", () => {
+    window.location.href = "monthly-breakdown.html";
+  });
+
+  document.getElementById("addIncomeSidebarBtn")?.addEventListener("click", () => {
+    document.getElementById("incomeModal").style.display = "flex";
+  });
+
+  document.getElementById("addExpenseSidebarBtn")?.addEventListener("click", () => {
+    document.getElementById("expenseModal").style.display = "flex";
+  });
+
+  document.getElementById("logoutBtn")?.addEventListener("click", () => {
+    localStorage.removeItem("isLoggedIn");
+    localStorage.removeItem("currentUser");
+    window.location.replace("login.html");
+  });
+}

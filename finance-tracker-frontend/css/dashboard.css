@@ -328,6 +328,11 @@ body {
   color: #d1d5db;
 }
 
+.mini-calendar span.has-transaction {
+  background: #28a745;
+  color: white;
+  font-weight: bold;
+}
 
 
 .mini-calendar span.current-day {

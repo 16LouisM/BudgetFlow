@@ -1,5 +1,3 @@
-// dashboard.js
-
 // ==========================
 // Utility Functions (Outer Scope)
 // ==========================
@@ -30,47 +28,37 @@ document.addEventListener('DOMContentLoaded', () => {
   const session = JSON.parse(localStorage.getItem("budgetflow_session"));
 
   if (!session) {
-    window.location.replace("login.html");
+    window.location.href = "login.html";
     return;
   }
 
   const userEmail = session.email;
 
-  // Per-user storage keys
   const TRANSACTION_KEY = `budgetflow_transactions_${userEmail}`;
-  const BUDGET_KEY = `budgetflow_budgets_${userEmail}`;
 
-  // ==========================
-  // Global variables
-  // ==========================
   let transactions = [];
-  let categoryBudgets = {};
   let selectedDate = new Date();
   let currentDate = new Date();
 
-  // DOM elements
   const totalIncomeEl = document.getElementById('totalIncome');
   const totalExpenseEl = document.getElementById('totalExpense');
   const balanceEl = document.getElementById('balance');
   const transactionListEl = document.getElementById('transactionList');
   const overviewMonthEl = document.getElementById('overviewMonth');
-  const budgetLimitEl = document.getElementById('budgetLimit');
-  const budgetRemainingEl = document.getElementById('budgetRemaining');
-  const budgetProgressEl = document.getElementById('budgetProgress');
   const miniCalendarEl = document.querySelector('.mini-calendar');
   const prevMonthBtn = document.getElementById('prevMonthBtn');
   const nextMonthBtn = document.getElementById('nextMonthBtn');
 
   // ==========================
-  // LOGOUT (SECURE)
+  // LOGOUT
   // ==========================
   document.getElementById("logoutBtn")?.addEventListener("click", () => {
     localStorage.removeItem("budgetflow_session");
-    window.location.replace("login.html");
+    window.location.href = "login.html";
   });
 
   // ==========================
-  // Storage functions
+  // STORAGE
   // ==========================
   function loadTransactions() {
     const stored = localStorage.getItem(TRANSACTION_KEY);
@@ -81,28 +69,22 @@ document.addEventListener('DOMContentLoaded', () => {
     localStorage.setItem(TRANSACTION_KEY, JSON.stringify(transactions));
   }
 
-  function loadBudgets() {
-    const stored = localStorage.getItem(BUDGET_KEY);
-    categoryBudgets = stored ? JSON.parse(stored) : {};
-  }
-
   // ==========================
-  // Helpers
+  // MONTH DISPLAY
   // ==========================
   function updateMonthDisplay() {
-    const monthNames = ['January','February','March','April','May','June',
-      'July','August','September','October','November','December'];
+    const monthNames = [
+      'January','February','March','April','May','June',
+      'July','August','September','October','November','December'
+    ];
 
-    const month = monthNames[selectedDate.getMonth()];
-    const year = selectedDate.getFullYear();
-
-    if (overviewMonthEl)
-      overviewMonthEl.textContent = `${month} ${year}`;
+    overviewMonthEl.textContent =
+      `${monthNames[selectedDate.getMonth()]} ${selectedDate.getFullYear()}`;
 
     if (nextMonthBtn) {
-      const nextMonthDate = new Date(selectedDate);
-      nextMonthDate.setMonth(selectedDate.getMonth() + 1);
-      nextMonthBtn.disabled = nextMonthDate > currentDate;
+      const next = new Date(selectedDate);
+      next.setMonth(selectedDate.getMonth() + 1);
+      nextMonthBtn.disabled = next > currentDate;
     }
   }
 
@@ -117,6 +99,9 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   }
 
+  // ==========================
+  // UPDATE UI
+  // ==========================
   function updateUI() {
 
     const filtered = filterTransactionsByMonth();
@@ -126,26 +111,6 @@ document.addEventListener('DOMContentLoaded', () => {
     totalIncomeEl.textContent = 'R' + totalIncome.toLocaleString();
     totalExpenseEl.textContent = 'R' + totalExpense.toLocaleString();
     balanceEl.textContent = 'R' + balance.toLocaleString();
-
-    const totalBudget = Object.values(categoryBudgets)
-      .reduce((a, b) => a + b, 0);
-
-    const remaining = totalBudget - totalExpense;
-
-    if (budgetLimitEl)
-      budgetLimitEl.textContent = 'R' + totalBudget.toLocaleString();
-
-    if (budgetRemainingEl)
-      budgetRemainingEl.textContent = 'R' + remaining.toLocaleString();
-
-    if (budgetProgressEl) {
-      const percentUsed = totalBudget > 0
-        ? (totalExpense / totalBudget) * 100
-        : 0;
-
-      budgetProgressEl.style.width =
-        Math.min(percentUsed, 100) + '%';
-    }
 
     transactionListEl.innerHTML = '';
 
@@ -163,14 +128,13 @@ document.addEventListener('DOMContentLoaded', () => {
 
         li.innerHTML = `
           <div class="transaction-item">
-            <span>${t.description}</span>
-            <span>${formatDisplayDate(t.date)}</span>
+            <span class="transaction-desc">${t.description}</span>
+            <span class="transaction-date">${formatDisplayDate(t.date)}</span>
             <span class="${amountClass}">
               ${sign}R${t.amount.toLocaleString()}
             </span>
           </div>
         `;
-
         transactionListEl.appendChild(li);
       });
     }
@@ -178,29 +142,44 @@ document.addEventListener('DOMContentLoaded', () => {
     renderMiniCalendar(filtered);
   }
 
+  // ==========================
+  // MINI CALENDAR
+  // ==========================
   function renderMiniCalendar(filtered) {
-    if (!miniCalendarEl) return;
 
     const year = selectedDate.getFullYear();
     const month = selectedDate.getMonth() + 1;
     const daysInMonth = new Date(year, month, 0).getDate();
 
+    const today = new Date();
+    const isCurrentMonth =
+      selectedDate.getMonth() === today.getMonth() &&
+      selectedDate.getFullYear() === today.getFullYear();
+
     const daysWithTransactions = new Set();
 
     filtered.forEach(t => {
-      if (t.date) {
-        const [y, m, d] = t.date.split('-').map(Number);
-        if (y === year && m === month)
-          daysWithTransactions.add(d);
-      }
+      const [, , d] = t.date.split('-').map(Number);
+      daysWithTransactions.add(d);
     });
 
     let html = '';
 
     for (let day = 1; day <= daysInMonth; day++) {
+
       let classes = [];
+
       if (daysWithTransactions.has(day))
         classes.push('has-transaction');
+
+      if (isCurrentMonth && day === today.getDate())
+        classes.push('current-day');
+
+      if (
+        isCurrentMonth &&
+        day > today.getDate()
+      )
+        classes.push('future-day');
 
       html += `<span class="${classes.join(' ')}">${day}</span>`;
     }
@@ -221,57 +200,76 @@ document.addEventListener('DOMContentLoaded', () => {
   nextMonthBtn?.addEventListener('click', () => changeMonth(1));
 
   // ==========================
-  // Add Income
+  // MODAL SYSTEM
   // ==========================
+  const modalContainer = document.getElementById("modal-container");
+
+  function openTransactionModal(type) {
+
+    const today = new Date().toISOString().split("T")[0];
+
+    modalContainer.innerHTML = `
+      <div class="modal" style="display:flex;">
+        <div class="modal-content">
+          <h2>Add ${type === 'income' ? 'Income' : 'Expense'}</h2>
+
+          <div class="form-group">
+            <label>Amount</label>
+            <input type="number" id="modalAmount" />
+          </div>
+
+          <div class="form-group">
+            <label>Description</label>
+            <input type="text" id="modalDescription" />
+          </div>
+
+          <div class="form-group">
+            <label>Date</label>
+            <input type="date" id="modalDate" value="${today}" />
+          </div>
+
+          <div class="modal-actions">
+            <button class="btn-cancel" id="cancelModal">Cancel</button>
+            <button class="btn-add" id="saveTransaction">Add</button>
+          </div>
+        </div>
+      </div>
+    `;
+
+    document.getElementById("cancelModal").onclick = () => {
+      modalContainer.innerHTML = "";
+    };
+
+    document.getElementById("saveTransaction").onclick = () => {
+
+      const amount = Number.parseFloat(document.getElementById("modalAmount").value);
+      const description = document.getElementById("modalDescription").value;
+      const date = document.getElementById("modalDate").value;
+
+      if (!amount || amount <= 0) return;
+
+      transactions.push({
+        type,
+        amount,
+        description,
+        date
+      });
+
+      saveTransactions();
+      updateUI();
+      modalContainer.innerHTML = "";
+    };
+  }
+
   document.getElementById('addIncomeBtn')
-    ?.addEventListener('click', () => {
+    ?.addEventListener('click', () => openTransactionModal('income'));
 
-      const amount = Number.parseFloat(prompt("Enter income amount:"));
-      if (Number.isNaN(amount) || amount <= 0) return;
-
-      const description = prompt("Description:");
-      const date = new Date()
-        .toISOString().split('T')[0];
-
-      transactions.push({
-        type: 'income',
-        amount,
-        description,
-        date
-      });
-
-      saveTransactions();
-      updateUI();
-    });
-
-  // ==========================
-  // Add Expense
-  // ==========================
   document.getElementById('addExpenseBtn')
-    ?.addEventListener('click', () => {
-
-      const amount = Number.parseFloat(prompt("Enter expense amount:"));
-      if (Number.isNaN(amount) || amount <= 0) return;
-
-      const description = prompt("Description:");
-      const date = new Date()
-        .toISOString().split('T')[0];
-
-      transactions.push({
-        type: 'expense',
-        amount,
-        description,
-        date
-      });
-
-      saveTransactions();
-      updateUI();
-    });
+    ?.addEventListener('click', () => openTransactionModal('expense'));
 
   // ==========================
   // INITIAL LOAD
   // ==========================
-  loadBudgets();
   loadTransactions();
   updateMonthDisplay();
   updateUI();

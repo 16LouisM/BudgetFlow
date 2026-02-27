@@ -1,19 +1,29 @@
+// ===============================
+// AUTH BACKEND LOGIC
+// ===============================
+
 document.addEventListener("DOMContentLoaded", () => {
+
+  console.log("Auth JS Loaded");
 
   const loginForm = document.getElementById("loginForm");
   const registerForm = document.getElementById("registerForm");
 
-  // ================= LOGIN =================
+  // ===============================
+  // LOGIN
+  // ===============================
   if (loginForm) {
+
+    console.log("Login form detected");
 
     loginForm.addEventListener("submit", async function (e) {
       e.preventDefault();
 
-      const email = document.getElementById("email").value;
-      const password = document.getElementById("password").value;
+      const email = document.getElementById("email").value.trim();
+      const password = document.getElementById("password").value.trim();
       const errorMsg = document.getElementById("errorMsg");
 
-      errorMsg.textContent = "";
+      if (errorMsg) errorMsg.textContent = "";
 
       try {
         const response = await fetch("http://localhost:8080/api/auth/login", {
@@ -25,33 +35,42 @@ document.addEventListener("DOMContentLoaded", () => {
         });
 
         const result = await response.text();
+        console.log("Login response:", result);
 
         if (response.ok) {
-          localStorage.setItem("isLoggedIn", "true");
+
+          localStorage.setItem("budgetflow_session", JSON.stringify({
+            email: email
+          }));
+
           window.location.href = "dashboard.html";
-        } else {
-          errorMsg.textContent = result;
         }
 
       } catch (error) {
-        console.error(error);
-        errorMsg.textContent = "Server error. Make sure backend is running.";
+        console.error("Login error:", error);
+        if (errorMsg) {
+          errorMsg.textContent = "Server error. Make sure backend is running.";
+        }
       }
     });
   }
 
-  // ================= REGISTER =================
+  // ===============================
+  // REGISTER
+  // ===============================
   if (registerForm) {
+
+    console.log("Register form detected");
 
     registerForm.addEventListener("submit", async function (e) {
       e.preventDefault();
 
-      const name = document.getElementById("name").value;
-      const email = document.getElementById("email").value;
-      const password = document.getElementById("password").value;
+      const name = document.getElementById("name").value.trim();
+      const email = document.getElementById("email").value.trim();
+      const password = document.getElementById("password").value.trim();
       const errorMsg = document.getElementById("errorMsg");
 
-      errorMsg.textContent = "";
+      if (errorMsg) errorMsg.textContent = "";
 
       try {
         const response = await fetch("http://localhost:8080/api/auth/register", {
@@ -63,17 +82,20 @@ document.addEventListener("DOMContentLoaded", () => {
         });
 
         const result = await response.text();
+        console.log("Register response:", result);
 
         if (response.ok) {
           alert("Registration successful! Please login.");
           window.location.href = "login.html";
-        } else {
+        } else if (errorMsg) {
           errorMsg.textContent = result;
         }
 
       } catch (error) {
-        console.error(error);
-        errorMsg.textContent = "Server error. Make sure backend is running.";
+        console.error("Register error:", error);
+        if (errorMsg) {
+          errorMsg.textContent = "Server error. Make sure backend is running.";
+        }
       }
     });
   }

@@ -18,6 +18,9 @@ public class UserController {
 
     @PostMapping
     public User createUser(@RequestBody User user) {
+        if (user == null) {
+            throw new IllegalArgumentException("User cannot be null");
+        }
         return userRepository.save(user);
     }
 

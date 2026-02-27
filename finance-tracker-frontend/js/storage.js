@@ -10,7 +10,7 @@ const Storage = {
     // =============================
     setCurrentUser(email) {
         localStorage.setItem("currentUser", email);
-        localStorage.setItem("isLoggedIn", "true");
+        localStorage.clear();
     },
 
     getCurrentUser() {

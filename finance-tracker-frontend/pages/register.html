@@ -14,9 +14,6 @@
 
     <script>
         // 🔐 If already logged in, block register page
-        if (localStorage.getItem("isLoggedIn") === "true") {
-            window.location.replace("dashboard.html");
-        }
 
         // 🔐 Prevent back/forward cache issues
         window.addEventListener("pageshow", function (event) {

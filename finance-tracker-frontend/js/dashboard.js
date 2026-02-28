@@ -25,16 +25,15 @@ document.addEventListener('DOMContentLoaded', () => {
   // ==========================
   // 🔐 SESSION PROTECTION
   // ==========================
-  const session = JSON.parse(localStorage.getItem("budgetflow_session"));
+  const isLoggedIn = localStorage.getItem("isLoggedIn");
+  const currentUser = localStorage.getItem("currentUser");
 
-  if (!session) {
+  if (isLoggedIn !== "true" || !currentUser) {
     window.location.href = "login.html";
     return;
   }
 
-  const userEmail = session.email;
-
-  const TRANSACTION_KEY = `budgetflow_transactions_${userEmail}`;
+  const TRANSACTION_KEY = `budgetflow_transactions_${currentUser}`;
 
   let transactions = [];
   let selectedDate = new Date();
@@ -74,8 +73,8 @@ document.addEventListener('DOMContentLoaded', () => {
   // ==========================
   function updateMonthDisplay() {
     const monthNames = [
-      'January','February','March','April','May','June',
-      'July','August','September','October','November','December'
+      'January', 'February', 'March', 'April', 'May', 'June',
+      'July', 'August', 'September', 'October', 'November', 'December'
     ];
 
     overviewMonthEl.textContent =

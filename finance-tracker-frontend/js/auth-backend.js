@@ -49,7 +49,7 @@ document.addEventListener("DOMContentLoaded", () => {
       } catch (error) {
         console.error("Login error:", error);
         if (errorMsg) {
-          errorMsg.textContent = "Server error. Make sure backend is running.";
+          errorMsg.textContent = "Server error.";
         }
       }
     });
@@ -92,7 +92,7 @@ document.addEventListener("DOMContentLoaded", () => {
       } catch (error) {
         console.error("Register error:", error);
         if (errorMsg) {
-          errorMsg.textContent = "Server error. Make sure backend is running.";
+          errorMsg.textContent = "Server error.";
         }
       }
     });

@@ -36,7 +36,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
         } catch (error) {
             console.error("Registration error:", error);
-            errorMsg.textContent = "Server error. Make sure backend is running.";
+            errorMsg.textContent = "Server error.";
         }
 
     });

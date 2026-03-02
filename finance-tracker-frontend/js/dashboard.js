@@ -73,11 +73,20 @@ document.addEventListener('DOMContentLoaded', () => {
   // ==========================
   // LOGOUT
   // ==========================
-  document.getElementById("logoutBtn")?.addEventListener("click", () => {
-    localStorage.removeItem("isLoggedIn");
-    localStorage.removeItem("currentUser");
-    window.location.href = "login.html";
-  });
+  // ==========================
+  // LOGOUT
+  // ==========================
+  const logoutBtn = document.getElementById("logoutBtn");
+  if (logoutBtn) {
+    logoutBtn.addEventListener("click", () => {
+      console.log("Logout clicked");
+      localStorage.removeItem("isLoggedIn");
+      localStorage.removeItem("currentUser");
+      window.location.replace("login.html");
+    });
+  } else {
+    console.warn("Logout button not found in dashboard");
+  }
 
   // ==========================
   // MONTHLY BREAKDOWN NAVIGATION

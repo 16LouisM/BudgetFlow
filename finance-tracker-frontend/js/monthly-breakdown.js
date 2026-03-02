@@ -31,6 +31,11 @@ const expenseCategories = [
   'Bills & Utilities', 'Other'
 ];
 
+const incomeCategories = [
+  'Allowance', 'NSFAS/Bursary/Scholarship', 'Side-Hustle', 'Gift',
+  'Internship/Stipend', 'Savings', 'Stokvel', 'Other'
+];
+
 // ======================
 // DOM ELEMENTS
 // ======================
@@ -44,6 +49,7 @@ const expenseChartCtx = document.getElementById('expenseChart')?.getContext('2d'
 const budgetTableBody = document.getElementById('budgetTableBody');
 const insightsContent = document.getElementById('insightsContent');
 const budgetMessagesDiv = document.getElementById('budgetMessages');
+const modalContainer = document.getElementById("modal-container");
 
 // ======================================================
 // STORAGE (USER-SPECIFIC)
@@ -222,99 +228,127 @@ function refreshMonthlyView() {
 }
 
 // ======================================================
-// MODALS
+// MODAL SYSTEM (Injected, matching dashboard.js style)
 // ======================================================
-function initIncomeModal() {
-  const modal = document.getElementById('incomeModal');
-  const form = document.getElementById('incomeForm');
-  const addBtn = document.getElementById('addIncomeBtn');
 
-  addBtn?.addEventListener('click', ()=> modal.style.display='flex');
+function openTransactionModal(type) {
+  const today = new Date().toISOString().split("T")[0];
+  const isIncome = type === 'income';
+  const title = isIncome ? 'Add Income' : 'Add Expense';
+  const categories = isIncome ? incomeCategories : expenseCategories;
 
-  form?.addEventListener('submit',(e)=>{
-    e.preventDefault();
+  let categoryOptions = '';
+  categories.forEach(cat => {
+    categoryOptions += `<option value="${cat}">${cat}</option>`;
+  });
 
-    const amount = Number.parseFloat(document.getElementById('amount').value);
-    const description = document.getElementById('description').value;
-    const date = document.getElementById('date').value;
-    const category = document.getElementById('category').value;
+  modalContainer.innerHTML = `
+    <div class="modal" style="display:flex;">
+      <div class="modal-content">
+        <h2>${title}</h2>
+        <div class="form-group">
+          <label>Category</label>
+          <select id="modalCategory" required>
+            <option value="" disabled selected>Select</option>
+            ${categoryOptions}
+          </select>
+        </div>
+        <div class="form-group">
+          <label>Description</label>
+          <input type="text" id="modalDescription" placeholder="e.g. ${isIncome ? 'Monthly allowance' : 'Dinner'}" required>
+        </div>
+        <div class="form-group">
+          <label>Amount (R)</label>
+          <input type="number" id="modalAmount" placeholder="e.g. ${isIncome ? '1500' : '500'}" step="0.01" required>
+        </div>
+        <div class="form-group">
+          <label>Date</label>
+          <input type="date" id="modalDate" value="${today}" required>
+        </div>
+        <div class="modal-actions">
+          <button class="btn-clear" id="clearModal">Clear</button>
+          <button class="btn-cancel" id="cancelModal">Cancel</button>
+          <button class="btn-add" id="saveTransaction">Add</button>
+        </div>
+      </div>
+    </div>
+  `;
 
-    if (Number.isNaN(amount) || amount <= 0) return alert('Invalid amount');
+  const clearBtn = document.getElementById("clearModal");
+  const cancelBtn = document.getElementById("cancelModal");
+  const saveBtn = document.getElementById("saveTransaction");
 
-    transactions.push({ type:'income', amount, description, date, category });
+  // Clear button resets form and sets today's date
+  clearBtn.onclick = () => {
+    const dateInput = document.getElementById("modalDate");
+    dateInput.value = today;
+    document.getElementById("modalCategory").value = '';
+    document.getElementById("modalDescription").value = '';
+    document.getElementById("modalAmount").value = '';
+  };
+
+  cancelBtn.onclick = () => {
+    modalContainer.innerHTML = "";
+  };
+
+  saveBtn.onclick = () => {
+    const category = document.getElementById("modalCategory").value;
+    const description = document.getElementById("modalDescription").value;
+    const amount = Number.parseFloat(document.getElementById("modalAmount").value);
+    const date = document.getElementById("modalDate").value;
+
+    if (!category || !description || Number.isNaN(amount) || amount <= 0) {
+      alert('Please fill all fields correctly.');
+      return;
+    }
+
+    transactions.push({
+      type,
+      amount,
+      description,
+      date,
+      category
+    });
+
     saveTransactions();
-
-    modal.style.display='none';
-    form.reset();
     refreshMonthlyView();
+    modalContainer.innerHTML = "";
+  };
+
+  // Close if clicking outside modal content
+  const modal = document.querySelector('.modal');
+  modal.addEventListener('click', (e) => {
+    if (e.target === modal) modalContainer.innerHTML = "";
   });
 }
 
-function initExpenseModal() {
-  const modal = document.getElementById('expenseModal');
-  const form = document.getElementById('expenseForm');
-  const addBtn = document.getElementById('addExpenseBtn');
-
-  addBtn?.addEventListener('click', ()=> modal.style.display='flex');
-
-  form?.addEventListener('submit',(e)=>{
-    e.preventDefault();
-
-    const amount = Number.parseFloat(document.getElementById('expenseAmount').value);
-    const description = document.getElementById('expenseDescription').value;
-    const date = document.getElementById('expenseDate').value;
-    const category = document.getElementById('expenseCategory').value;
-
-    if (Number.isNaN(amount) || amount <= 0) return alert('Invalid amount');
-
-    transactions.push({ type:'expense', amount, description, date, category });
-    saveTransactions();
-
-    modal.style.display='none';
-    form.reset();
-    refreshMonthlyView();
-  });
-}
+// ======================================================
+// SIDEBAR BUTTONS
+// ======================================================
+document.getElementById('addIncomeBtn')?.addEventListener('click', () => openTransactionModal('income'));
+document.getElementById('addExpenseBtn')?.addEventListener('click', () => openTransactionModal('expense'));
 
 // ======================================================
-// INIT
-// ======================================================
-function initPage() {
-  setCurrentMonthYear();
-  loadBudgets();
-  loadTransactions();
-  refreshMonthlyView();
-  initIncomeModal();
-  initExpenseModal();
-  initSidebarNavigation();
-}
-
-document.addEventListener('DOMContentLoaded', initPage);
-
-// ======================
 // SIDEBAR NAVIGATION
-// ======================
-function initSidebarNavigation() {
+// ======================================================
+document.getElementById("dashboardBtn")?.addEventListener("click", () => {
+  window.location.href = "dashboard.html";
+});
 
-  document.getElementById("dashboardBtn")?.addEventListener("click", () => {
-    window.location.href = "dashboard.html";
-  });
+document.getElementById("monthlyBreakdownBtn")?.addEventListener("click", () => {
+  window.location.href = "monthly-breakdown.html";
+});
 
-  document.getElementById("monthlyBreakdownBtn")?.addEventListener("click", () => {
-    window.location.href = "monthly-breakdown.html";
-  });
+document.getElementById("logoutBtn")?.addEventListener("click", () => {
+  localStorage.removeItem("isLoggedIn");
+  localStorage.removeItem("currentUser");
+  window.location.replace("login.html");
+});
 
-  document.getElementById("addIncomeSidebarBtn")?.addEventListener("click", () => {
-    document.getElementById("incomeModal").style.display = "flex";
-  });
-
-  document.getElementById("addExpenseSidebarBtn")?.addEventListener("click", () => {
-    document.getElementById("expenseModal").style.display = "flex";
-  });
-
-  document.getElementById("logoutBtn")?.addEventListener("click", () => {
-    localStorage.removeItem("isLoggedIn");
-    localStorage.removeItem("currentUser");
-    window.location.replace("login.html");
-  });
-}
+// ======================================================
+// INITIALISE PAGE
+// ======================================================
+setCurrentMonthYear();
+loadBudgets();
+loadTransactions();
+refreshMonthlyView();

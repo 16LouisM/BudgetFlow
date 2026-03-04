@@ -55,47 +55,50 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   }
 
-  // ===============================
-  // REGISTER
-  // ===============================
-  if (registerForm) {
+// ===============================
+// REGISTER
+// ===============================
+if (registerForm) {
 
-    registerForm.addEventListener("submit", async function (e) {
-      e.preventDefault();
+  registerForm.addEventListener("submit", async function (e) {
+    e.preventDefault();
 
-      const name = document.getElementById("name").value.trim();
-      const email = document.getElementById("email").value.trim();
-      const password = document.getElementById("password").value.trim();
-      const errorMsg = document.getElementById("errorMsg");
+    const fullName = document.getElementById("fullName").value.trim();
+    const email = document.getElementById("email").value.trim();
+    const password = document.getElementById("password").value.trim();
+    const confirmPassword = document.getElementById("confirmPassword").value.trim();
+    const errorMsg = document.getElementById("errorMsg");
 
-      if (errorMsg) errorMsg.textContent = "";
+    errorMsg.textContent = "";
 
-      try {
-        const response = await fetch("http://localhost:8080/api/auth/register", {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json"
-          },
-          body: JSON.stringify({ name, email, password })
-        });
+    if (password !== confirmPassword) {
+      errorMsg.textContent = "Passwords do not match.";
+      return;
+    }
 
-        const result = await response.text();
-        console.log("Register response:", result);
+    try {
+      const response = await fetch("http://localhost:8080/api/auth/register", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ fullName, email, password })
+      });
 
-        if (response.ok) {
-          alert("Registration successful! Please login.");
-          window.location.replace("login.html");
-        } else if (errorMsg) {
-          errorMsg.textContent = result;
-        }
+      const result = await response.text();
 
-      } catch (error) {
-        console.error("Register error:", error);
-        if (errorMsg) {
-          errorMsg.textContent = "Server error.";
-        }
+      if (!response.ok) {
+        errorMsg.textContent = result;
+        return;
       }
-    });
-  }
+
+      alert("Registration successful! Please login.");
+      window.location.href = "login.html";
+
+    } catch (error) {
+      console.error("Registration error:", error);
+      errorMsg.textContent = "Server error. Make sure backend is running.";
+    }
+
+  });
+}
 
 });

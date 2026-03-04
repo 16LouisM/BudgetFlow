@@ -1,32 +1,60 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <title>BudgetFlow | Register</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-    <!-- 🔐 Disable cache -->
+    <!-- Prevent caching -->
     <meta http-equiv="Cache-Control" content="no-store" />
     <meta http-equiv="Pragma" content="no-cache" />
     <meta http-equiv="Expires" content="0" />
 
-    <link rel="stylesheet" href="../css/register.css">
-
-    <script>
-        // 🔐 If already logged in, redirect to dashboard
-        if (localStorage.getItem("isLoggedIn") === "true") {
-            window.location.replace("dashboard.html");
-        }
-
-        // 🔐 Prevent back/forward cache issues
-        window.addEventListener("pageshow", function (event) {
-            if (event.persisted) {
-                window.location.reload();
-            }
-        });
-    </script>
+    <link rel="stylesheet" href="../css/styles.css">
 </head>
+
 <body>
-    <!-- rest of your HTML unchanged -->
+
+    <div class="login-card">
+        <h2>Create Account</h2>
+
+        <form id="registerForm">
+
+            <input type="text"
+                   id="fullName"
+                   placeholder="Full Name"
+                   required>
+
+            <input type="email"
+                   id="email"
+                   placeholder="Email"
+                   required>
+
+            <input type="password"
+                   id="password"
+                   placeholder="Password"
+                   required>
+
+            <input type="password"
+                   id="confirmPassword"
+                   placeholder="Confirm Password"
+                   required>
+
+            <p id="errorMsg" class="error-message"></p>
+
+            <button type="submit">Register</button>
+
+            <p>
+                Already have an account?
+                <a href="login.html">Login</a>
+            </p>
+
+        </form>
+    </div>
+
+    <script src="../js/auth-backend.js"></script>
+
 </body>
+
 </html>

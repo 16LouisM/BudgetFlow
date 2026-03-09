@@ -1,5 +1,5 @@
 // ==========================
-// DASHBOARD.JS (Full Version)
+// DASHBOARD.JS (Full Version with Clear Button)
 // ==========================
 
 // ==========================
@@ -27,7 +27,6 @@ function calculateTotals(filteredTransactions) {
 // BUDGET PROGRESS FUNCTION
 // ==========================
 function updateBudgetProgress(totalSpent, totalBudget, progressBar) {
-
   let percent = 0;
 
   if (totalBudget > 0) {
@@ -138,7 +137,6 @@ document.addEventListener('DOMContentLoaded', () => {
   // MONTH DISPLAY
   // ==========================
   function updateMonthDisplay() {
-
     const monthNames = [
       'January','February','March','April','May','June',
       'July','August','September','October','November','December'
@@ -158,31 +156,22 @@ document.addEventListener('DOMContentLoaded', () => {
   // FILTER TRANSACTIONS
   // ==========================
   function filterTransactionsByMonth() {
-
     const year = selectedDate.getFullYear();
     const month = selectedDate.getMonth() + 1;
 
     return transactions.filter(t => {
-
       if (!t.date) return false;
-
       const [y, m] = t.date.split('-').map(Number);
-
       return y === year && m === month;
-
     });
-
   }
 
   // ==========================
   // UPDATE UI
   // ==========================
   function updateUI() {
-
     const filtered = filterTransactionsByMonth();
-
     const { totalIncome, totalExpense } = calculateTotals(filtered);
-
     const balance = totalIncome - totalExpense;
 
     totalIncomeEl.textContent = 'R' + totalIncome.toLocaleString();
@@ -206,19 +195,12 @@ document.addEventListener('DOMContentLoaded', () => {
     transactionListEl.innerHTML = '';
 
     if (filtered.length === 0) {
-
       transactionListEl.innerHTML = '<li>No transactions yet. Add some!</li>';
-
     } else {
-
-      filtered.slice().reverse().slice(0,10).forEach(t => {
-
+      filtered.slice().reverse().slice(0, 10).forEach(t => {
         const li = document.createElement('li');
-
         const sign = t.type === 'income' ? '+' : '-';
-
-        const amountClass =
-          t.type === 'income' ? 'income-amount' : 'expense-amount';
+        const amountClass = t.type === 'income' ? 'income-amount' : 'expense-amount';
 
         li.innerHTML = `
         <div class="transaction-item">
@@ -231,30 +213,23 @@ document.addEventListener('DOMContentLoaded', () => {
         `;
 
         transactionListEl.appendChild(li);
-
       });
-
     }
 
     // ==========================
     // MINI CALENDAR
     // ==========================
     renderMiniCalendar(filtered);
-
   }
 
   // ==========================
   // MINI CALENDAR
   // ==========================
   function renderMiniCalendar(filtered) {
-
     const year = selectedDate.getFullYear();
     const month = selectedDate.getMonth() + 1;
-
     const daysInMonth = new Date(year, month, 0).getDate();
-
     const today = new Date();
-
     const isCurrentMonth =
       selectedDate.getMonth() === today.getMonth() &&
       selectedDate.getFullYear() === today.getFullYear();
@@ -269,7 +244,6 @@ document.addEventListener('DOMContentLoaded', () => {
     let html = '';
 
     for (let day = 1; day <= daysInMonth; day++) {
-
       let classes = [];
 
       if (daysWithTransactions.has(day))
@@ -282,48 +256,36 @@ document.addEventListener('DOMContentLoaded', () => {
         classes.push('future-day');
 
       html += `<span class="${classes.join(' ')}">${day}</span>`;
-
     }
 
     miniCalendarEl.innerHTML = html;
-
   }
 
   // ==========================
   // MONTH NAVIGATION
   // ==========================
   function changeMonth(delta) {
-
     selectedDate.setMonth(selectedDate.getMonth() + delta);
-
     if (selectedDate > currentDate)
       selectedDate = new Date(currentDate);
 
     updateMonthDisplay();
-
     updateUI();
-
   }
 
   prevMonthBtn?.addEventListener('click', () => changeMonth(-1));
-
   nextMonthBtn?.addEventListener('click', () => changeMonth(1));
 
   // ==========================
-  // MODAL SYSTEM
+  // MODAL SYSTEM (with Clear Button)
   // ==========================
   function openTransactionModal(type) {
-
     const today = new Date().toISOString().split("T")[0];
-
     const isIncome = type === 'income';
-
     const title = isIncome ? 'Add Income' : 'Add Expense';
-
     const categories = isIncome ? incomeCategories : expenseCategories;
 
     let categoryOptions = '';
-
     categories.forEach(cat => {
       categoryOptions += `<option value="${cat}">${cat}</option>`;
     });
@@ -336,27 +298,28 @@ document.addEventListener('DOMContentLoaded', () => {
         <div class="form-group">
           <label>Category</label>
           <select id="modalCategory">
-            <option disabled selected>Select</option>
+            <option value="" disabled selected>Select</option>
             ${categoryOptions}
           </select>
         </div>
 
         <div class="form-group">
           <label>Description</label>
-          <input type="text" id="modalDescription">
+          <input type="text" id="modalDescription" placeholder="e.g. ${isIncome ? 'Monthly allowance' : 'Dinner'}" />
         </div>
 
         <div class="form-group">
           <label>Amount (R)</label>
-          <input type="number" id="modalAmount">
+          <input type="number" id="modalAmount" placeholder="e.g. ${isIncome ? '1500' : '500'}" step="0.01" />
         </div>
 
         <div class="form-group">
           <label>Date</label>
-          <input type="date" id="modalDate" value="${today}">
+          <input type="date" id="modalDate" value="${today}" />
         </div>
 
         <div class="modal-actions">
+          <button class="btn-clear" id="clearModal">Clear</button>
           <button class="btn-cancel" id="cancelModal">Cancel</button>
           <button class="btn-add" id="saveTransaction">Add</button>
         </div>
@@ -365,19 +328,29 @@ document.addEventListener('DOMContentLoaded', () => {
     </div>
     `;
 
+    // Clear button: reset all fields to default
+    document.getElementById("clearModal").onclick = () => {
+      const dateInput = document.getElementById("modalDate");
+      dateInput.value = today;
+      document.getElementById("modalCategory").value = '';
+      document.getElementById("modalDescription").value = '';
+      document.getElementById("modalAmount").value = '';
+    };
+
+    // Cancel button: close modal
     document.getElementById("cancelModal").onclick = () => {
       modalContainer.innerHTML = "";
     };
 
+    // Save button: add transaction
     document.getElementById("saveTransaction").onclick = () => {
-
       const category = document.getElementById("modalCategory").value;
       const description = document.getElementById("modalDescription").value;
       const amount = Number.parseFloat(document.getElementById("modalAmount").value);
       const date = document.getElementById("modalDate").value;
 
-      if (!category || !description || Number.isNaN(amount)) {
-        alert("Please complete all fields");
+      if (!category || !description || Number.isNaN(amount) || amount <= 0) {
+        alert("Please complete all fields correctly.");
         return;
       }
 
@@ -390,15 +363,12 @@ document.addEventListener('DOMContentLoaded', () => {
       });
 
       saveTransactions();
-
       updateUI();
-
       modalContainer.innerHTML = "";
-
     };
-
   }
 
+  // Attach modal triggers to sidebar buttons
   document.getElementById('addIncomeBtn')
     ?.addEventListener('click', () => openTransactionModal('income'));
 

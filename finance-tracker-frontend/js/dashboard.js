@@ -56,6 +56,31 @@ document.addEventListener('DOMContentLoaded', () => {
   const isLoggedIn = localStorage.getItem("isLoggedIn");
   const currentUser = localStorage.getItem("currentUser");
 
+  // ==========================
+  // 👋 DYNAMIC GREETING
+  // ==========================
+  const welcomeMessage = document.getElementById("welcomeMessage");
+
+  if (welcomeMessage && currentUser) {
+
+    // Extract name from email
+    const name = currentUser.split("@")[0];
+    const formattedName = name.charAt(0).toUpperCase() + name.slice(1);
+
+    const hour = new Date().getHours();
+    let greeting = "";
+
+    if (hour < 12) {
+      greeting = "Good Morning ☀️";
+    } else if (hour < 18) {
+      greeting = "Good Afternoon 🌤";
+    } else {
+      greeting = "Good Evening 🌙";
+    }
+
+    welcomeMessage.textContent = `${greeting}, ${formattedName} 👋`;
+  }
+
   if (isLoggedIn !== "true" || !currentUser) {
     window.location.href = "login.html";
     return;
@@ -138,8 +163,8 @@ document.addEventListener('DOMContentLoaded', () => {
   // ==========================
   function updateMonthDisplay() {
     const monthNames = [
-      'January','February','March','April','May','June',
-      'July','August','September','October','November','December'
+      'January', 'February', 'March', 'April', 'May', 'June',
+      'July', 'August', 'September', 'October', 'November', 'December'
     ];
 
     overviewMonthEl.textContent =

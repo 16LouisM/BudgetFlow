@@ -12,7 +12,8 @@ public class CorsConfig {
     @Bean
     public CorsFilter corsFilter() {
         CorsConfiguration config = new CorsConfiguration();
-        config.addAllowedOrigin("*");
+
+        config.addAllowedOrigin("https://budget-flow-ashen.vercel.app");
         config.addAllowedHeader("*");
         config.addAllowedMethod("*");
 

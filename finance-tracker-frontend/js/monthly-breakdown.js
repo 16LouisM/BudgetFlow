@@ -156,28 +156,49 @@ function updateSummary(totalIncome, totalExpense, categorySpent) {
 }
 
 // ======================================================
-// TABLE
+// BUDGET STATUS HELPER
+// ======================================================
+function getBudgetStatus(spent, budget) {
+  if (budget === 0 || budget === undefined) {
+    return { text: 'No budget', className: '' };
+  }
+  const remaining = budget - spent;
+  const percentUsed = (spent / budget) * 100;
+  if (remaining < 0) {
+    return { text: 'Exceeded', className: 'exceeded' };
+  } else if (percentUsed >= 80) {
+    return { text: 'Warning', className: 'warning' };
+  } else {
+    return { text: 'On track', className: 'good' };
+  }
+}
+
+// ======================================================
+// TABLE (with Budget, Remaining, and Status columns)
 // ======================================================
 function renderBudgetTable(categorySpent) {
   let html = '';
-  let highest = { name:'', spent:0 };
+  let highest = { name: '', spent: 0 };
 
   expenseCategories.forEach(cat => {
     const spent = categorySpent[cat] || 0;
     const budget = categoryBudgets[cat] || 0;
     const remaining = budget - spent;
+    const status = getBudgetStatus(spent, budget);
 
-    if (spent > highest.spent)
-      highest = { name:cat, spent };
+    if (spent > highest.spent) {
+      highest = { name: cat, spent };
+    }
 
     html += `
       <tr>
         <td>${cat}</td>
-        <td>${budget ? 'R'+budget.toLocaleString() : '-'}</td>
+        <td>${budget ? 'R' + budget.toLocaleString() : '-'}</td>
         <td>R${spent.toLocaleString()}</td>
-        <td class="${remaining<0?'exceeded':''}">
-          ${budget ? 'R'+remaining.toLocaleString() : '-'}
+        <td class="${remaining < 0 ? 'exceeded' : ''}">
+          ${budget ? 'R' + remaining.toLocaleString() : '-'}
         </td>
+        <td class="${status.className}">${status.text}</td>
       </tr>
     `;
   });
@@ -199,18 +220,18 @@ function renderChart(categorySpent) {
   if (expenseChart) expenseChart.destroy();
 
   expenseChart = new Chart(expenseChartCtx, {
-    type:'pie',
-    data:{
+    type: 'pie',
+    data: {
       labels: expenseCategories,
-      datasets:[{
-        data: expenseCategories.map(cat=>categorySpent[cat]||0),
-        backgroundColor:[
-          '#FF6384','#36A2EB','#FFCE56','#4BC0C0','#9966FF',
-          '#FF9F40','#E7E9ED','#76A346','#C45850','#6A4C9C','#8B4513'
+      datasets: [{
+        data: expenseCategories.map(cat => categorySpent[cat] || 0),
+        backgroundColor: [
+          '#FF6384', '#36A2EB', '#FFCE56', '#4BC0C0', '#9966FF',
+          '#FF9F40', '#E7E9ED', '#76A346', '#C45850', '#6A4C9C', '#8B4513'
         ]
       }]
     },
-    options:{ responsive:true }
+    options: { responsive: true }
   });
 }
 
@@ -219,8 +240,7 @@ function renderChart(categorySpent) {
 // ======================================================
 function refreshMonthlyView() {
   const monthly = filterCurrentMonthTransactions();
-  const { totalIncome, totalExpense, categorySpent } =
-    calculateTotals(monthly);
+  const { totalIncome, totalExpense, categorySpent } = calculateTotals(monthly);
 
   updateSummary(totalIncome, totalExpense, categorySpent);
   renderChart(categorySpent);
@@ -228,9 +248,8 @@ function refreshMonthlyView() {
 }
 
 // ======================================================
-// MODAL SYSTEM (Injected, matching dashboard.js style)
+// MODAL SYSTEM (Add Income/Expense)
 // ======================================================
-
 function openTransactionModal(type) {
   const today = new Date().toISOString().split("T")[0];
   const isIncome = type === 'income';
@@ -246,6 +265,7 @@ function openTransactionModal(type) {
     <div class="modal" style="display:flex;">
       <div class="modal-content">
         <h2>${title}</h2>
+
         <div class="form-group">
           <label>Category</label>
           <select id="modalCategory" required>
@@ -253,23 +273,28 @@ function openTransactionModal(type) {
             ${categoryOptions}
           </select>
         </div>
+
         <div class="form-group">
           <label>Description</label>
           <input type="text" id="modalDescription" placeholder="e.g. ${isIncome ? 'Monthly allowance' : 'Dinner'}" required>
         </div>
+
         <div class="form-group">
           <label>Amount (R)</label>
           <input type="number" id="modalAmount" placeholder="e.g. ${isIncome ? '1500' : '500'}" step="0.01" required>
         </div>
+
         <div class="form-group">
           <label>Date</label>
           <input type="date" id="modalDate" value="${today}" required>
         </div>
+
         <div class="modal-actions">
           <button class="btn-clear" id="clearModal">Clear</button>
           <button class="btn-cancel" id="cancelModal">Cancel</button>
           <button class="btn-add" id="saveTransaction">Add</button>
         </div>
+
       </div>
     </div>
   `;
@@ -278,13 +303,11 @@ function openTransactionModal(type) {
   const cancelBtn = document.getElementById("cancelModal");
   const saveBtn = document.getElementById("saveTransaction");
 
-  // Clear button resets form and sets today's date
   clearBtn.onclick = () => {
-    const dateInput = document.getElementById("modalDate");
-    dateInput.value = today;
     document.getElementById("modalCategory").value = '';
     document.getElementById("modalDescription").value = '';
     document.getElementById("modalAmount").value = '';
+    document.getElementById("modalDate").value = today;
   };
 
   cancelBtn.onclick = () => {
@@ -298,16 +321,16 @@ function openTransactionModal(type) {
     const date = document.getElementById("modalDate").value;
 
     if (!category || !description || Number.isNaN(amount) || amount <= 0) {
-      alert('Please fill all fields correctly.');
+      alert("Please complete all fields correctly.");
       return;
     }
 
     transactions.push({
       type,
-      amount,
+      category,
       description,
-      date,
-      category
+      amount,
+      date
     });
 
     saveTransactions();
@@ -315,7 +338,65 @@ function openTransactionModal(type) {
     modalContainer.innerHTML = "";
   };
 
-  // Close if clicking outside modal content
+  // Close when clicking outside
+  const modal = document.querySelector('.modal');
+  modal.addEventListener('click', (e) => {
+    if (e.target === modal) modalContainer.innerHTML = "";
+  });
+}
+
+// ======================================================
+// SET BUDGETS MODAL
+// ======================================================
+function openBudgetModal() {
+  let inputsHtml = '';
+  expenseCategories.forEach(cat => {
+    const currentBudget = categoryBudgets[cat] || '';
+    inputsHtml += `
+      <div class="form-group">
+        <label>${cat}</label>
+        <input type="number" id="budget_${cat}" value="${currentBudget}" min="0" step="0.01" placeholder="0">
+      </div>
+    `;
+  });
+
+  modalContainer.innerHTML = `
+    <div class="modal" style="display:flex;">
+      <div class="modal-content" style="max-width: 600px;">
+        <h2>Set Monthly Budgets</h2>
+        <p style="color: #9ca3af; margin-bottom: 15px;">Enter amounts for each category (leave blank for no budget)</p>
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px; max-height: 400px; overflow-y: auto; padding: 5px;">
+          ${inputsHtml}
+        </div>
+        <div class="modal-actions">
+          <button class="btn-cancel" id="cancelBudget">Cancel</button>
+          <button class="btn-add" id="saveBudgets">Save Budgets</button>
+        </div>
+      </div>
+    </div>
+  `;
+
+  document.getElementById("cancelBudget").onclick = () => {
+    modalContainer.innerHTML = "";
+  };
+
+  document.getElementById("saveBudgets").onclick = () => {
+    const newBudgets = {};
+    expenseCategories.forEach(cat => {
+      const input = document.getElementById(`budget_${cat}`);
+      if (input && input.value.trim() !== '') {
+        const val = Number.parseFloat(input.value);
+        if (!Number.isNaN(val) && val >= 0) {
+          newBudgets[cat] = val;
+        }
+      }
+    });
+    categoryBudgets = newBudgets;
+    saveBudgets();
+    refreshMonthlyView();
+    modalContainer.innerHTML = "";
+  };
+
   const modal = document.querySelector('.modal');
   modal.addEventListener('click', (e) => {
     if (e.target === modal) modalContainer.innerHTML = "";
@@ -327,16 +408,13 @@ function openTransactionModal(type) {
 // ======================================================
 document.getElementById('addIncomeBtn')?.addEventListener('click', () => openTransactionModal('income'));
 document.getElementById('addExpenseBtn')?.addEventListener('click', () => openTransactionModal('expense'));
+document.getElementById('setBudgetsBtn')?.addEventListener('click', () => openBudgetModal());
 
 // ======================================================
 // SIDEBAR NAVIGATION
 // ======================================================
 document.getElementById("dashboardBtn")?.addEventListener("click", () => {
   window.location.href = "dashboard.html";
-});
-
-document.getElementById("monthlyBreakdownBtn")?.addEventListener("click", () => {
-  window.location.href = "monthly-breakdown.html";
 });
 
 document.getElementById("logoutBtn")?.addEventListener("click", () => {

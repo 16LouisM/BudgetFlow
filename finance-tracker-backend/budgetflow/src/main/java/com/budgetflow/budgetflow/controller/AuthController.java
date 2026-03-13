@@ -2,8 +2,12 @@ package com.budgetflow.budgetflow.controller;
 
 import com.budgetflow.budgetflow.model.User;
 import com.budgetflow.budgetflow.repository.UserRepository;
+
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
+
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 
 import java.util.Optional;
 
@@ -22,29 +26,39 @@ public class AuthController {
         this.passwordEncoder = passwordEncoder;
     }
 
+    // ===============================
     // REGISTER
+    // ===============================
     @PostMapping("/register")
-    public String register(@RequestBody User user) {
+    public ResponseEntity<String> register(@RequestBody User user) {
 
-        if (userRepository.findByEmail(user.getEmail()).isPresent()) {
-            return "Email already registered.";
+        Optional<User> existingUser = userRepository.findByEmail(user.getEmail());
+
+        if (existingUser.isPresent()) {
+            return ResponseEntity
+                    .status(HttpStatus.BAD_REQUEST)
+                    .body("Email already registered.");
         }
 
         user.setPassword(passwordEncoder.encode(user.getPassword()));
         userRepository.save(user);
 
-        return "User registered successfully!";
+        return ResponseEntity.ok("User registered successfully!");
     }
 
+    // ===============================
     // LOGIN
+    // ===============================
     @PostMapping("/login")
-    public String login(@RequestBody User loginRequest) {
+    public ResponseEntity<String> login(@RequestBody User loginRequest) {
 
         Optional<User> userOptional =
                 userRepository.findByEmail(loginRequest.getEmail());
 
         if (userOptional.isEmpty()) {
-            return INVALID_CREDENTIALS;
+            return ResponseEntity
+                    .status(HttpStatus.UNAUTHORIZED)
+                    .body(INVALID_CREDENTIALS);
         }
 
         User user = userOptional.get();
@@ -53,9 +67,11 @@ public class AuthController {
                 loginRequest.getPassword(),
                 user.getPassword())) {
 
-            return "Login successful!";
+            return ResponseEntity.ok("Login successful!");
         } else {
-            return INVALID_CREDENTIALS;
+            return ResponseEntity
+                    .status(HttpStatus.UNAUTHORIZED)
+                    .body(INVALID_CREDENTIALS);
         }
     }
 }
